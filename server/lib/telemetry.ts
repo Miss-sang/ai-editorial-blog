@@ -102,6 +102,8 @@ interface RecordAiUsageInput {
 
 const TELEMETRY_STORE_PATH = join(process.cwd(), '.data', 'telemetry.json')
 const LOOKBACK_WINDOW_MS = 7 * 24 * 60 * 60 * 1000
+const canUseLocalTelemetryStore = !process.env.VERCEL
+let memoryTelemetryState: StoredTelemetryState | null = null
 
 function normalizeNullableString(value: unknown, limit = 400) {
   if (typeof value !== 'string') {
@@ -197,6 +199,14 @@ function hydrateTelemetryState(raw: Partial<StoredTelemetryState>) {
 }
 
 async function readFallbackTelemetryState() {
+  if (!canUseLocalTelemetryStore) {
+    if (!memoryTelemetryState) {
+      memoryTelemetryState = buildEmptyTelemetryState()
+    }
+
+    return memoryTelemetryState
+  }
+
   try {
     const raw = await readFile(TELEMETRY_STORE_PATH, 'utf8')
     return hydrateTelemetryState(JSON.parse(raw) as Partial<StoredTelemetryState>)
@@ -208,6 +218,12 @@ async function readFallbackTelemetryState() {
 }
 
 async function writeFallbackTelemetryState(state: StoredTelemetryState) {
+  memoryTelemetryState = state
+
+  if (!canUseLocalTelemetryStore) {
+    return
+  }
+
   await mkdir(join(process.cwd(), '.data'), {
     recursive: true
   })

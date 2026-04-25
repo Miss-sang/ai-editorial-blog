@@ -172,6 +172,8 @@ interface PrismaClientAdapter {
 }
 
 const STORE_PATH = join(process.cwd(), '.data', 'content-studio.json')
+const canUseLocalFallbackStore = !process.env.VERCEL
+let memoryFallbackState: StoredState | null = null
 
 const projectSortWeight: Record<ProjectRecord['status'], number> = {
   LIVE: 0,
@@ -733,6 +735,14 @@ function hydrateStoredState(raw: Partial<StoredState>) {
 }
 
 async function readFallbackState() {
+  if (!canUseLocalFallbackStore) {
+    if (!memoryFallbackState) {
+      memoryFallbackState = buildFallbackState()
+    }
+
+    return memoryFallbackState
+  }
+
   try {
     const raw = await readFile(STORE_PATH, 'utf8')
     return hydrateStoredState(JSON.parse(raw) as Partial<StoredState>)
@@ -744,6 +754,12 @@ async function readFallbackState() {
 }
 
 async function writeFallbackState(state: StoredState) {
+  memoryFallbackState = state
+
+  if (!canUseLocalFallbackStore) {
+    return
+  }
+
   await mkdir(join(process.cwd(), '.data'), {
     recursive: true
   })
@@ -1377,7 +1393,7 @@ export async function createArticle(payload: ArticleEditorPayload) {
   }
 
   state.articles.unshift(article)
-  await writeFallbackState(state)
+  await writeFallbackStateSafely(state)
   return toArticleRecord(state, article)
 }
 
@@ -1525,7 +1541,7 @@ export async function updateArticle(id: string, payload: ArticleEditorPayload) {
   }
 
   state.articles.splice(articleIndex, 1, updatedArticle)
-  await writeFallbackState(state)
+  await writeFallbackStateSafely(state)
   return toArticleRecord(state, updatedArticle)
 }
 
@@ -1586,7 +1602,7 @@ export async function updateArticleStatus(id: string, action: ArticleStatusActio
   }
 
   state.articles.splice(articleIndex, 1, updatedArticle)
-  await writeFallbackState(state)
+  await writeFallbackStateSafely(state)
   return toArticleRecord(state, updatedArticle)
 }
 
@@ -1619,7 +1635,7 @@ export async function deleteArticle(id: string) {
   }
 
   state.articles = nextArticles
-  await writeFallbackState(state)
+  await writeFallbackStateSafely(state)
   return true
 }
 
@@ -1704,7 +1720,7 @@ export async function createTopic(payload: TopicEditorPayload) {
   }
 
   state.topics.push(topic)
-  await writeFallbackState(state)
+  await writeFallbackStateSafely(state)
   return toTopicRecordFromStored(state, topic)
 }
 
@@ -1773,7 +1789,7 @@ export async function updateTopic(id: string, payload: TopicEditorPayload) {
   }
 
   state.topics.splice(topicIndex, 1, topic)
-  await writeFallbackState(state)
+  await writeFallbackStateSafely(state)
   return toTopicRecordFromStored(state, topic)
 }
 
@@ -1827,7 +1843,7 @@ export async function deleteTopic(id: string) {
   }
 
   state.topics = nextTopics
-  await writeFallbackState(state)
+  await writeFallbackStateSafely(state)
   return true
 }
 
@@ -1912,7 +1928,7 @@ export async function createTag(payload: TagEditorPayload) {
   }
 
   state.tags.push(tag)
-  await writeFallbackState(state)
+  await writeFallbackStateSafely(state)
   return toTagRecordFromStored(state, tag)
 }
 
@@ -1981,7 +1997,7 @@ export async function updateTag(id: string, payload: TagEditorPayload) {
   }
 
   state.tags.splice(tagIndex, 1, tag)
-  await writeFallbackState(state)
+  await writeFallbackStateSafely(state)
   return toTagRecordFromStored(state, tag)
 }
 
@@ -2039,7 +2055,7 @@ export async function deleteTag(id: string) {
   }
 
   state.tags = nextTags
-  await writeFallbackState(state)
+  await writeFallbackStateSafely(state)
   return true
 }
 
@@ -2157,7 +2173,7 @@ export async function createProject(payload: ProjectEditorPayload) {
   }
 
   state.projects.unshift(project)
-  await writeFallbackState(state)
+  await writeFallbackStateSafely(state)
   return toProjectRecordFromStored(project)
 }
 
@@ -2256,7 +2272,7 @@ export async function updateProject(id: string, payload: ProjectEditorPayload) {
   }
 
   state.projects.splice(projectIndex, 1, project)
-  await writeFallbackState(state)
+  await writeFallbackStateSafely(state)
   return toProjectRecordFromStored(project)
 }
 
@@ -2289,7 +2305,7 @@ export async function deleteProject(id: string) {
   }
 
   state.projects = nextProjects
-  await writeFallbackState(state)
+  await writeFallbackStateSafely(state)
   return true
 }
 

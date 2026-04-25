@@ -29,7 +29,11 @@ function escapeSqlLiteral(value) {
 }
 
 const env = await readEnvFile()
-const connectionString = env.DATABASE_URL
+const connectionString =
+  process.env.DATABASE_URL_OVERRIDE ||
+  process.env.DATABASE_URL ||
+  env.DATABASE_URL_OVERRIDE ||
+  env.DATABASE_URL
 
 if (!connectionString) {
   throw new Error('DATABASE_URL is missing in .env')
@@ -45,11 +49,17 @@ if (!currentUser.startsWith('prisma.')) {
   )
 }
 
-const adminUrl = new URL(connectionString)
-adminUrl.username = encodeURIComponent(currentUser.replace(/^prisma\./, 'postgres.'))
+const adminConnectionString =
+  process.env.ADMIN_DATABASE_URL ||
+  env.ADMIN_DATABASE_URL ||
+  (() => {
+    const adminUrl = new URL(connectionString)
+    adminUrl.username = encodeURIComponent(currentUser.replace(/^prisma\./, 'postgres.'))
+    return adminUrl.toString()
+  })()
 
 const client = new Client({
-  connectionString: adminUrl.toString(),
+  connectionString: adminConnectionString,
   ssl: {
     rejectUnauthorized: false
   }
@@ -94,6 +104,17 @@ try {
       2
     )
   )
+} catch (error) {
+  if (error instanceof Error) {
+    console.error(
+      [
+        'Failed to connect with admin database credentials.',
+        'If you rotated the Supabase database password, update local .env DATABASE_URL first.',
+        'You can also provide a dedicated admin connection string via ADMIN_DATABASE_URL.'
+      ].join(' ')
+    )
+  }
+  throw error
 } finally {
   await client.end()
 }
