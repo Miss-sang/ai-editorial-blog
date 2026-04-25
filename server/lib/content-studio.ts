@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { createError } from 'h3'
@@ -571,7 +572,7 @@ function buildFallbackState(): StoredState {
     const topic =
       topicsBySlug.get(topicSlug) ??
       {
-        id: crypto.randomUUID(),
+        id: randomUUID(),
         name: article.category,
         slug: topicSlug,
         description: `${article.category} 相关的知识梳理与实践总结。`,
@@ -586,7 +587,7 @@ function buildFallbackState(): StoredState {
       const tagRecord =
         tagsBySlug.get(tagSlug) ??
         {
-          id: crypto.randomUUID(),
+          id: randomUUID(),
           name: tag,
           slug: tagSlug,
           color: null,
@@ -635,7 +636,7 @@ function hydrateStoredState(raw: Partial<StoredState>) {
         const createdAt = normalizeTimestamp(topic.createdAt, now)
 
         return {
-          id: String(topic.id || crypto.randomUUID()),
+          id: String(topic.id || randomUUID()),
           name: String(topic.name || '未命名专题').trim(),
           slug: createSlug(String(topic.slug || topic.name || '未命名专题')),
           description: topic.description ? String(topic.description) : null,
@@ -650,7 +651,7 @@ function hydrateStoredState(raw: Partial<StoredState>) {
         const createdAt = normalizeTimestamp(tag.createdAt, now)
 
         return {
-          id: String(tag.id || crypto.randomUUID()),
+          id: String(tag.id || randomUUID()),
           name: String(tag.name || '未命名标签').trim(),
           slug: createSlug(String(tag.slug || tag.name || '未命名标签')),
           color: tag.color ? String(tag.color) : null,
@@ -667,7 +668,7 @@ function hydrateStoredState(raw: Partial<StoredState>) {
         const bodyMd = String(article.bodyMd || '').trim()
 
         return {
-          id: String(article.id || crypto.randomUUID()),
+          id: String(article.id || randomUUID()),
           title: String(article.title || '未命名文章').trim(),
           slug: createSlug(String(article.slug || article.title || '未命名文章')),
           summary,
@@ -701,7 +702,7 @@ function hydrateStoredState(raw: Partial<StoredState>) {
           const createdAt = normalizeTimestamp(project.createdAt, now)
 
           return {
-            id: String(project.id || crypto.randomUUID()),
+            id: String(project.id || randomUUID()),
             title: String(project.title || '未命名项目').trim(),
             slug: createSlug(String(project.slug || project.title || '未命名项目')),
             summary: String(project.summary || '').trim(),
@@ -841,7 +842,7 @@ function ensureTopicInFallback(state: StoredState, topicName: string) {
 
   const timestamp = new Date().toISOString()
   const topic: StoredTopic = {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     name: topicName,
     slug,
     description: null,
@@ -864,7 +865,7 @@ function ensureTagsInFallback(state: StoredState, tagNames: string[]) {
 
     const timestamp = new Date().toISOString()
     const tag: StoredTag = {
-      id: crypto.randomUUID(),
+      id: randomUUID(),
       name: tagName,
       slug,
       color: null,
@@ -1356,7 +1357,7 @@ export async function createArticle(payload: ArticleEditorPayload) {
   }
 
   const article: StoredArticle = {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     title: normalized.title,
     slug: normalized.slug,
     summary: normalized.summary,
@@ -1694,7 +1695,7 @@ export async function createTopic(payload: TopicEditorPayload) {
 
   const timestamp = new Date().toISOString()
   const topic: StoredTopic = {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     name: normalized.name,
     slug: normalized.slug,
     description: normalized.description || null,
@@ -1902,7 +1903,7 @@ export async function createTag(payload: TagEditorPayload) {
 
   const timestamp = new Date().toISOString()
   const tag: StoredTag = {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     name: normalized.name,
     slug: normalized.slug,
     color: normalized.color || null,
@@ -2140,7 +2141,7 @@ export async function createProject(payload: ProjectEditorPayload) {
   }
 
   const project: StoredProject = {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     title: normalized.title,
     slug: normalized.slug,
     summary: normalized.summary,

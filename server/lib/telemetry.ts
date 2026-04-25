@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { H3Event } from 'h3'
@@ -151,7 +151,7 @@ function hydrateTelemetryState(raw: Partial<StoredTelemetryState>) {
   return {
     pageVisits: Array.isArray(raw.pageVisits)
       ? raw.pageVisits.map((item) => ({
-          id: normalizeRequiredString(item.id, crypto.randomUUID()),
+          id: normalizeRequiredString(item.id, randomUUID()),
           path: normalizeRequiredString(item.path, '/'),
           sessionId: normalizeNullableString(item.sessionId, 120),
           referrer: normalizeNullableString(item.referrer, 400),
@@ -163,7 +163,7 @@ function hydrateTelemetryState(raw: Partial<StoredTelemetryState>) {
       : [],
     searches: Array.isArray(raw.searches)
       ? raw.searches.map((item) => ({
-          id: normalizeRequiredString(item.id, crypto.randomUUID()),
+          id: normalizeRequiredString(item.id, randomUUID()),
           query: normalizeRequiredString(item.query),
           normalizedQuery: normalizeRequiredString(item.normalizedQuery),
           resultCount: normalizeInteger(item.resultCount),
@@ -176,7 +176,7 @@ function hydrateTelemetryState(raw: Partial<StoredTelemetryState>) {
       : [],
     aiUsage: Array.isArray(raw.aiUsage)
       ? raw.aiUsage.map((item) => ({
-          id: normalizeRequiredString(item.id, crypto.randomUUID()),
+          id: normalizeRequiredString(item.id, randomUUID()),
           feature: normalizeRequiredString(item.feature),
           provider: normalizeRequiredString(item.provider, 'longcat'),
           model: normalizeNullableString(item.model, 160),
@@ -338,7 +338,7 @@ export function toTelemetryErrorMessage(error: unknown) {
 export async function recordPageVisit(event: H3Event, input: RecordPageVisitInput) {
   const context = buildTelemetryContext(event, input.referrer)
   const record: StoredPageVisitLog = {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     path: normalizePath(input.path),
     sessionId: context.sessionId,
     referrer: context.referrer,
@@ -379,7 +379,7 @@ export async function recordSearchQuery(event: H3Event, input: RecordSearchInput
 
   const context = buildTelemetryContext(event)
   const record: StoredSearchLog = {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     query: input.query.trim().replace(/\s+/gu, ' ').slice(0, 400),
     normalizedQuery,
     resultCount: Math.max(0, Math.floor(input.resultCount)),
@@ -415,7 +415,7 @@ export async function recordSearchQuery(event: H3Event, input: RecordSearchInput
 export async function recordAiUsage(event: H3Event, input: RecordAiUsageInput) {
   const context = buildTelemetryContext(event)
   const record: StoredAiUsageLog = {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     feature: normalizeRequiredString(input.feature),
     provider: normalizeRequiredString(input.provider, 'longcat'),
     model: normalizeNullableString(input.model, 160),
@@ -522,7 +522,7 @@ export async function getTelemetrySummary(): Promise<TelemetrySummaryResponse> {
         .sort((left, right) => right.count - left.count || left.query.localeCompare(right.query))
         .slice(0, 5),
       recentAiEvents: aiUsage.slice(0, 5).map((item) => ({
-        id: normalizeRequiredString(item.id, crypto.randomUUID()),
+        id: normalizeRequiredString(item.id, randomUUID()),
         feature: normalizeRequiredString(item.feature),
         status: normalizeRequiredString(item.status),
         model: normalizeRequiredString(item.model, normalizeRequiredString(item.provider, 'longcat')),

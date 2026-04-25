@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { createError, defineEventHandler, readMultipartFormData } from 'h3'
 import { createServerSupabaseServiceClient } from '~/server/lib/supabase'
 import { requireAdminSession } from '~/server/utils/admin-session'
@@ -37,7 +38,7 @@ export default defineEventHandler(async (event): Promise<UploadResult> => {
   const supabase = createServerSupabaseServiceClient()
   const filename = file.filename || `cover-${Date.now()}`
   const extension = filename.includes('.') ? filename.split('.').pop() || 'png' : 'png'
-  const objectPath = `covers/${new Date().toISOString().slice(0, 10)}/${createSlug(filename.replace(/\.[^.]+$/, ''))}-${crypto.randomUUID()}.${extension}`
+  const objectPath = `covers/${new Date().toISOString().slice(0, 10)}/${createSlug(filename.replace(/\.[^.]+$/, ''))}-${randomUUID()}.${extension}`
   const storageBucket = String(config.supabaseStorageBucket || '')
 
   if (supabase && storageBucket) {
