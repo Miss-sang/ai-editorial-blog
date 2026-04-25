@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Blog Week 3 Public Web"
+  short_description: "Ship public pages, markdown UX, search, and SEO."
+  default_prompt: "Use this skill to complete week 3 public web work for the AI technical blog project."

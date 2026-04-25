@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Blog Week 5 Quality Ops"
+  short_description: "Add telemetry, tests, safeguards, and responsive polish."
+  default_prompt: "Use this skill to complete week 5 quality and operations work for the AI technical blog project."

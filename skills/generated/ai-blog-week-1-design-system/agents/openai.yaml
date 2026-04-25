@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Blog Week 1 Design System"
+  short_description: "Build tokens, Tailwind base, and shared UI primitives."
+  default_prompt: "Use this skill to complete the design system slice of week 1 for the AI technical blog project."

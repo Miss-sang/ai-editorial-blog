@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Blog Week 1 Repo Tooling"
+  short_description: "Set repo scripts, linting, TS config, and env rules."
+  default_prompt: "Use this skill to complete the repository tooling slice of week 1 for the AI technical blog project."

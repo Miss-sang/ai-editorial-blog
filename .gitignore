@@ -1,0 +1,17 @@
+node_modules
+.nuxt
+.output
+output
+.data
+dist
+coverage
+.vercel
+.idea
+.vscode
+.DS_Store
+.env
+.env.*
+!.env.example
+.npm-cache
+.nuxt-dev.log
+prisma/dev.db

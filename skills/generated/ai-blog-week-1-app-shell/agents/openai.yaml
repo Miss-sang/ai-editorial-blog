@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Blog Week 1 App Shell"
+  short_description: "Create layouts, route shells, and app navigation structure."
+  default_prompt: "Use this skill to complete the app shell slice of week 1 for the AI technical blog project."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Blog Public Layout Interaction"
+  short_description: "Fix public hero layout, navigation, and clickability."
+  default_prompt: "Use $ai-blog-public-layout-interaction to repair the public layout, fullscreen hero behavior, navigation styling, and click issues."

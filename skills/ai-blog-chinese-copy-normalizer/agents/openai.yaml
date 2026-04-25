@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Blog Chinese Copy Normalizer"
+  short_description: "Normalize Chinese UI copy and formatting."
+  default_prompt: "Use $ai-blog-chinese-copy-normalizer to convert user-facing copy into consistent Chinese labels, titles, and status text."

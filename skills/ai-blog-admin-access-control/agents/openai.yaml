@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Blog Admin Access Control"
+  short_description: "Lock admin access to the owner and normalize login flow."
+  default_prompt: "Use $ai-blog-admin-access-control to implement owner-only admin login, unauthorized access feedback, and Chinese auth copy."

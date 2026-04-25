@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Blog Change Orchestrator"
+  short_description: "Coordinate the nine-skill blog refactor sequence."
+  default_prompt: "Use $ai-blog-change-orchestrator to choose the next active skill, gate prerequisites, and define the current implementation scope."
