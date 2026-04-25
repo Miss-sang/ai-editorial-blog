@@ -202,7 +202,7 @@ async function readFallbackTelemetryState() {
     return hydrateTelemetryState(JSON.parse(raw) as Partial<StoredTelemetryState>)
   } catch {
     const emptyState = buildEmptyTelemetryState()
-    await writeFallbackTelemetryState(emptyState)
+    await writeFallbackTelemetryStateSafely(emptyState)
     return emptyState
   }
 }
@@ -212,6 +212,15 @@ async function writeFallbackTelemetryState(state: StoredTelemetryState) {
     recursive: true
   })
   await writeFile(TELEMETRY_STORE_PATH, JSON.stringify(state, null, 2), 'utf8')
+}
+
+async function writeFallbackTelemetryStateSafely(state: StoredTelemetryState) {
+  try {
+    await writeFallbackTelemetryState(state)
+  } catch {
+    // On read-only runtimes such as serverless deployments, fallback telemetry
+    // should degrade silently instead of breaking page requests or client beacons.
+  }
 }
 
 async function runTelemetryWithPrisma<T>(
@@ -358,7 +367,7 @@ export async function recordPageVisit(event: H3Event, input: RecordPageVisitInpu
   const state = await readFallbackTelemetryState()
   state.pageVisits.push(record)
   state.pageVisits = state.pageVisits.slice(-500)
-  await writeFallbackTelemetryState(state)
+  await writeFallbackTelemetryStateSafely(state)
 }
 
 export async function recordSearchQuery(event: H3Event, input: RecordSearchInput) {
@@ -400,7 +409,7 @@ export async function recordSearchQuery(event: H3Event, input: RecordSearchInput
   const state = await readFallbackTelemetryState()
   state.searches.push(record)
   state.searches = state.searches.slice(-500)
-  await writeFallbackTelemetryState(state)
+  await writeFallbackTelemetryStateSafely(state)
 }
 
 export async function recordAiUsage(event: H3Event, input: RecordAiUsageInput) {
@@ -442,7 +451,7 @@ export async function recordAiUsage(event: H3Event, input: RecordAiUsageInput) {
   const state = await readFallbackTelemetryState()
   state.aiUsage.push(record)
   state.aiUsage = state.aiUsage.slice(-500)
-  await writeFallbackTelemetryState(state)
+  await writeFallbackTelemetryStateSafely(state)
 }
 
 export async function getTelemetrySummary(): Promise<TelemetrySummaryResponse> {

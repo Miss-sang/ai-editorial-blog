@@ -737,7 +737,7 @@ async function readFallbackState() {
     return hydrateStoredState(JSON.parse(raw) as Partial<StoredState>)
   } catch {
     const state = buildFallbackState()
-    await writeFallbackState(state)
+    await writeFallbackStateSafely(state)
     return state
   }
 }
@@ -747,6 +747,15 @@ async function writeFallbackState(state: StoredState) {
     recursive: true
   })
   await writeFile(STORE_PATH, JSON.stringify(state, null, 2), 'utf8')
+}
+
+async function writeFallbackStateSafely(state: StoredState) {
+  try {
+    await writeFallbackState(state)
+  } catch {
+    // Some deployment targets use a read-only filesystem. In that case,
+    // keep serving the in-memory fallback state instead of failing the request.
+  }
 }
 
 interface RunWithPrismaOptions {
