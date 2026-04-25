@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { marked } from 'marked'
 import { ImagePlus, Sparkles, Trash2, UploadCloud } from 'lucide-vue-next'
 import type {
   ArticleEditorPayload,
@@ -13,6 +12,7 @@ import {
   formatDisplayDateTime,
   getArticleStatusLabel
 } from '~/utils/display'
+import { renderMarkdown } from '~/utils/markdown'
 
 const props = withDefaults(
   defineProps<{
@@ -88,7 +88,7 @@ watch(
 )
 
 const previewHtml = computed(() => {
-  return (marked.parse(form.bodyMd || '# 在这里开始撰写文章\n\n先写问题，再写方案，再写代码细节') as string) || ''
+  return renderMarkdown(form.bodyMd || '# 在这里开始撰写文章\n\n先写问题，再写方案，再写代码细节')
 })
 
 const statusTone = (
@@ -383,7 +383,7 @@ const fieldClass =
           <h2 class="text-2xl font-semibold tracking-tight">阅读检查</h2>
         </div>
         <div
-          class="prose prose-invert max-w-none rounded-[1.6rem] border border-line/[0.15] bg-[#0b1118] p-6 prose-headings:font-semibold prose-p:text-[#c8d3e0] prose-strong:text-white prose-code:text-accent prose-pre:bg-black/30"
+          class="markdown-content rounded-[1.6rem] border border-line/[0.15] bg-[#0b1118] p-6"
           v-html="previewHtml"
         />
       </AppSurface>

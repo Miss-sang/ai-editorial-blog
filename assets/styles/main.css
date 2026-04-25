@@ -277,6 +277,32 @@
     @apply text-accent;
   }
 
+  .markdown-content {
+    @apply prose max-w-none prose-headings:font-semibold prose-headings:text-ink-strong prose-p:text-ink-soft prose-a:text-accent prose-strong:text-ink-strong prose-li:text-ink-soft prose-blockquote:border-accent/30 prose-blockquote:text-ink-soft prose-hr:border-line/10 prose-code:font-mono prose-code:text-accent prose-pre:overflow-x-auto prose-pre:rounded-[1.35rem] prose-pre:border prose-pre:border-line/[0.12] prose-pre:bg-surface-strong/70 prose-pre:px-5 prose-pre:py-4 prose-pre:text-ink-strong prose-th:text-ink-strong prose-td:text-ink-soft;
+  }
+
+  .markdown-content :where(code):not(:where(pre code)) {
+    @apply rounded-md bg-surface px-1.5 py-0.5 text-[0.9em];
+  }
+
+  .markdown-content :where(code):not(:where(pre code))::before,
+  .markdown-content :where(code):not(:where(pre code))::after {
+    content: '';
+  }
+
+  .markdown-content :where(pre code) {
+    @apply bg-transparent p-0 text-inherit;
+  }
+
+  .markdown-content :where(ul),
+  .markdown-content :where(ol) {
+    @apply pl-5;
+  }
+
+  .markdown-content :where(li) > p {
+    @apply my-0;
+  }
+
   .surface-frame {
     @apply rounded-shell border border-line/[0.15] bg-surface/[0.85] shadow-panel backdrop-blur-sm;
   }

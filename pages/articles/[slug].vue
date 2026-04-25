@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { marked } from 'marked'
 import { Clock3, ListTree, Sparkles } from 'lucide-vue-next'
 import type { ArticleRecord } from '~/types/content-studio'
 import { formatDisplayDate } from '~/utils/display'
 import { getFetchStatusMessage } from '~/utils/fetch-error'
+import { renderMarkdown } from '~/utils/markdown'
 
 interface OutlineItem {
   id: string
@@ -67,7 +67,7 @@ function createHeadingAnchorId(value: string, counts: Map<string, number>) {
 }
 
 function buildArticleRenderState(markdown: string) {
-  const html = ((marked.parse(markdown) as string) || '')
+  const html = renderMarkdown(markdown)
     .replace(/^<h1>[\s\S]*?<\/h1>\s*/u, '')
     .trim()
   const headingIds = new Map<string, number>()
@@ -215,7 +215,7 @@ useHead(() => ({
           </p>
           <div
             ref="articleBodyRef"
-            class="prose max-w-none prose-headings:font-semibold prose-headings:text-ink-strong prose-a:text-accent prose-p:text-ink-soft prose-li:text-ink-soft prose-strong:text-ink-strong prose-code:text-accent prose-pre:bg-surface-strong/70 prose-pre:text-ink-strong prose-blockquote:border-accent/30 prose-blockquote:text-ink-soft"
+            class="markdown-content"
             v-html="bodyHtml"
           />
         </AppSurface>

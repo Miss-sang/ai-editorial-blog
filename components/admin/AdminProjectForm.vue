@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { marked } from 'marked'
 import { FolderKanban, Save, Trash2 } from 'lucide-vue-next'
 import type { ProjectEditorPayload, ProjectRecord } from '~/types/content-studio'
 import { projectStatusOptions } from '~/types/content-studio'
@@ -7,6 +6,7 @@ import {
   formatDisplayDateTime,
   getProjectStatusLabel
 } from '~/utils/display'
+import { renderMarkdown } from '~/utils/markdown'
 
 const props = withDefaults(
   defineProps<{
@@ -71,7 +71,7 @@ watch(
 )
 
 const previewHtml = computed(() => {
-  return (marked.parse(form.contentMd || '# 项目背景\n\n## 目标\n## 技术方案\n## 页面亮点') as string) || ''
+  return renderMarkdown(form.contentMd || '# 项目背景\n\n## 目标\n## 技术方案\n## 页面亮点')
 })
 
 const updatedLabel = computed(() => formatDisplayDateTime(props.project?.updatedAt))
@@ -216,7 +216,7 @@ const submitForm = () => {
           <h2 class="text-2xl font-semibold tracking-tight">案例阅读效果</h2>
         </div>
         <div
-          class="prose prose-invert max-w-none rounded-[1.6rem] border border-line/[0.15] bg-[#0b1118] p-6 prose-headings:font-semibold prose-p:text-[#c8d3e0] prose-strong:text-white prose-code:text-accent prose-pre:bg-black/30"
+          class="markdown-content rounded-[1.6rem] border border-line/[0.15] bg-[#0b1118] p-6"
           v-html="previewHtml"
         />
       </AppSurface>
