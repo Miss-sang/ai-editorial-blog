@@ -2329,49 +2329,48 @@ export async function getContentDashboard(
 
   const dbDashboard = await runWithPrisma(
     async (prisma) => {
-      const articles = await prisma.article.findMany({
-        orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
-        take: 4,
-        include: {
-          topic: true,
-          tags: {
-            include: {
-              tag: true
+      const [articles, topics, tags, projects] = await Promise.all([
+        prisma.article.findMany({
+          orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
+          take: 4,
+          include: {
+            topic: true,
+            tags: {
+              include: {
+                tag: true
+              }
             }
           }
-        }
-      })
-
-      const topics = await prisma.topic.findMany({
-        orderBy: {
-          name: 'asc'
-        },
-        include: {
-          _count: {
-            select: {
-              articles: true
+        }),
+        prisma.topic.findMany({
+          orderBy: {
+            name: 'asc'
+          },
+          include: {
+            _count: {
+              select: {
+                articles: true
+              }
             }
           }
-        }
-      })
-
-      const tags = await prisma.tag.findMany({
-        orderBy: {
-          name: 'asc'
-        },
-        include: {
-          _count: {
-            select: {
-              articles: true
+        }),
+        prisma.tag.findMany({
+          orderBy: {
+            name: 'asc'
+          },
+          include: {
+            _count: {
+              select: {
+                articles: true
+              }
             }
           }
-        }
-      })
-
-      const projects = await prisma.project.findMany({
-        orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
-        take: 3
-      })
+        }),
+        prisma.project.findMany({
+          orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
+          take: 3
+        })
+      ])
 
       const totalArticles = await prisma.article.count()
       const draftArticles = await prisma.article.count({

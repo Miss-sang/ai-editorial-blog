@@ -45,9 +45,7 @@ const telemetryErrorMessage = computed(() => {
 })
 
 const refreshOverview = async () => {
-  await refreshBootstrap()
-  await refreshDashboard()
-  await refreshTelemetry()
+  await Promise.all([refreshBootstrap(), refreshDashboard(), refreshTelemetry()])
 }
 
 const stats = computed(() => [

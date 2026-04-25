@@ -477,30 +477,32 @@ export async function getTelemetrySummary(): Promise<TelemetrySummaryResponse> {
     }
 
     const cutoff = new Date(Date.now() - LOOKBACK_WINDOW_MS)
-    const pageVisits = await prisma.pageVisitLog.findMany({
-      where: {
-        createdAt: {
-          gte: cutoff
+    const [pageVisits, searches, aiUsage] = await Promise.all([
+      prisma.pageVisitLog.findMany({
+        where: {
+          createdAt: {
+            gte: cutoff
+          }
         }
-      }
-    })
-    const searches = await prisma.searchLog.findMany({
-      where: {
-        createdAt: {
-          gte: cutoff
+      }),
+      prisma.searchLog.findMany({
+        where: {
+          createdAt: {
+            gte: cutoff
+          }
         }
-      }
-    })
-    const aiUsage = await prisma.aiUsageLog.findMany({
-      where: {
-        createdAt: {
-          gte: cutoff
+      }),
+      prisma.aiUsageLog.findMany({
+        where: {
+          createdAt: {
+            gte: cutoff
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
         }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
+      })
+    ])
 
     const queryCounts = new Map<string, { query: string; count: number }>()
 
