@@ -19,7 +19,9 @@ watch(
 </script>
 
 <template>
-  <header class="sticky top-0 z-40 border-b border-line/10 bg-canvas/75 backdrop-blur-xl">
+  <header
+    class="sticky top-0 z-40 border-b border-line/10 bg-surface/90 shadow-[0_1px_0_rgb(15_23_42_/_0.03)] backdrop-blur-xl dark:bg-canvas/75 dark:shadow-none"
+  >
     <div class="mx-auto w-full max-w-[1400px] px-4 md:px-6 xl:px-8">
       <div class="flex h-[68px] items-center gap-3 xl:gap-3.5">
         <NuxtLink to="/" class="flex shrink-0 items-center gap-3">
@@ -29,7 +31,9 @@ watch(
             {{ appConfig.site.mark }}
           </span>
           <div class="hidden min-[480px]:block">
-            <p class="single-line text-sm font-semibold text-ink-strong">{{ appConfig.site.name }}</p>
+            <p class="single-line text-sm font-semibold text-ink-strong">
+              {{ appConfig.site.name }}
+            </p>
             <p class="single-line font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint">
               个人中文技术博客
             </p>
@@ -45,8 +49,8 @@ watch(
             :aria-current="isActiveLink(item.to) ? 'page' : undefined"
             :class="
               isActiveLink(item.to)
-                ? 'bg-surface-strong/70 text-ink-strong'
-                : 'text-ink-soft hover:bg-surface/70 hover:text-ink-strong'
+                ? 'bg-accent/10 text-accent dark:bg-surface-strong/70 dark:text-ink-strong'
+                : 'text-ink-soft hover:bg-surface-muted/80 hover:text-ink-strong dark:hover:bg-surface/70'
             "
           >
             {{ item.label }}
@@ -89,12 +93,17 @@ watch(
           <AppSurface class="space-y-5">
             <div class="grid gap-2">
               <NuxtLink
-              v-for="item in publicNavigation"
-              :key="item.to"
-              :to="item.to"
-              class="flex items-center justify-between rounded-2xl px-4 py-3 text-sm text-ink-soft transition hover:bg-surface-muted/70 hover:text-ink-strong"
-              :aria-current="isActiveLink(item.to) ? 'page' : undefined"
-            >
+                v-for="item in publicNavigation"
+                :key="item.to"
+                :to="item.to"
+                class="flex items-center justify-between rounded-2xl px-4 py-3 text-sm text-ink-soft transition hover:bg-surface-muted/70 hover:text-ink-strong"
+                :aria-current="isActiveLink(item.to) ? 'page' : undefined"
+                :class="
+                  isActiveLink(item.to)
+                    ? 'bg-accent/10 text-accent dark:bg-surface-strong/70 dark:text-ink-strong'
+                    : ''
+                "
+              >
                 <span class="single-line">{{ item.label }}</span>
                 <span class="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-faint">
                   {{ item.hint }}

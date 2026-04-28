@@ -68,7 +68,7 @@ const isActiveLink = (to: string) => {
           class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition"
           :class="
             isActiveLink(item.to)
-              ? 'bg-surface-strong/70 text-ink-strong'
+              ? 'bg-accent/10 text-accent dark:bg-surface-strong/70 dark:text-ink-strong'
               : 'border border-line/[0.15] text-ink-soft hover:border-accent/30 hover:text-ink-strong'
           "
           :aria-current="isActiveLink(item.to) ? 'page' : undefined"
@@ -104,8 +104,8 @@ const isActiveLink = (to: string) => {
           class="flex items-center justify-between rounded-2xl px-4 py-3 transition"
           :class="
             isActiveLink(item.to)
-              ? 'bg-surface-strong/70 text-ink-strong'
-              : 'text-ink-soft hover:bg-surface-muted/60 hover:text-ink-strong'
+              ? 'bg-accent/10 text-accent dark:bg-surface-strong/70 dark:text-ink-strong'
+              : 'text-ink-soft hover:bg-surface-muted/70 hover:text-ink-strong dark:hover:bg-surface-muted/60'
           "
           :aria-current="isActiveLink(item.to) ? 'page' : undefined"
         >
@@ -119,7 +119,9 @@ const isActiveLink = (to: string) => {
         </NuxtLink>
       </nav>
 
-      <div class="mt-auto space-y-3 rounded-2xl border border-dashed border-accent/25 bg-accent/[0.08] p-4">
+      <div
+        class="mt-auto space-y-3 rounded-2xl border border-dashed border-accent/25 bg-accent/[0.08] p-4"
+      >
         <p class="font-mono text-[11px] uppercase tracking-[0.24em] text-accent">快速跳转</p>
         <p class="text-sm leading-6 text-ink-soft">
           后台修改完成后，可直接返回前台检查展示效果，无需手动切换地址

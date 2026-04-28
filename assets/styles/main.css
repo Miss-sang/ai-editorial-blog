@@ -11,19 +11,19 @@
 @layer base {
   :root {
     color-scheme: light;
-    --color-canvas: 244 239 229;
-    --color-surface: 252 248 241;
-    --color-surface-muted: 240 234 222;
-    --color-surface-strong: 231 224 209;
-    --color-line: 19 28 38;
-    --color-ink-strong: 17 24 39;
-    --color-ink-soft: 76 88 102;
-    --color-ink-faint: 109 123 141;
-    --color-accent: 43 176 122;
-    --color-accent-warm: 213 124 68;
-    --color-success: 22 163 74;
-    --color-warning: 217 119 6;
-    --color-danger: 220 38 38;
+    --color-canvas: 247 248 250;
+    --color-surface: 255 255 255;
+    --color-surface-muted: 245 246 248;
+    --color-surface-strong: 238 241 245;
+    --color-line: 15 23 42;
+    --color-ink-strong: 24 30 38;
+    --color-ink-soft: 79 88 102;
+    --color-ink-faint: 145 153 166;
+    --color-accent: 22 119 255;
+    --color-accent-warm: 255 109 45;
+    --color-success: 32 149 95;
+    --color-warning: 232 140 37;
+    --color-danger: 225 65 65;
   }
 
   .dark {
@@ -53,11 +53,20 @@
 
   body {
     @apply bg-canvas font-sans text-ink-strong antialiased;
+    background-image: linear-gradient(
+      180deg,
+      rgb(255 255 255),
+      rgb(var(--color-canvas)) 16rem,
+      rgb(var(--color-canvas))
+    );
+    min-height: 100vh;
+  }
+
+  .dark body {
     background-image:
       radial-gradient(circle at top left, rgb(var(--color-accent) / 0.12), transparent 32%),
       radial-gradient(circle at top right, rgb(var(--color-accent-warm) / 0.1), transparent 26%),
       linear-gradient(180deg, rgb(var(--color-canvas)), rgb(var(--color-canvas)));
-    min-height: 100vh;
   }
 
   body::before {
@@ -65,16 +74,22 @@
     position: fixed;
     inset: 0;
     pointer-events: none;
-    background-image:
-      linear-gradient(to right, rgb(var(--color-line) / 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(var(--color-line) / 0.04) 1px, transparent 1px);
+    background-image: none;
     background-size: 64px 64px;
     mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.22), transparent 90%);
+    opacity: 0;
     z-index: -1;
   }
 
+  .dark body::before {
+    background-image:
+      linear-gradient(to right, rgb(var(--color-line) / 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--color-line) / 0.04) 1px, transparent 1px);
+    opacity: 1;
+  }
+
   ::selection {
-    background: rgb(var(--color-accent) / 0.2);
+    background: rgb(var(--color-accent) / 0.16);
   }
 
   h1,
@@ -170,11 +185,16 @@
     position: relative;
     isolation: isolate;
     background-image:
-      linear-gradient(120deg, rgb(var(--color-accent) / 0.08), transparent 42%),
-      linear-gradient(135deg, rgb(var(--color-surface) / 0.98), rgb(var(--color-surface-muted) / 0.86));
+      linear-gradient(120deg, rgb(var(--color-accent) / 0.055), transparent 40%),
+      linear-gradient(
+        180deg,
+        rgb(var(--color-surface) / 0.98),
+        rgb(var(--color-surface-muted) / 0.74)
+      );
     box-shadow:
-      0 24px 70px rgb(15 23 42 / 0.08),
-      inset 0 1px 0 rgb(255 255 255 / 0.42);
+      0 1px 2px rgb(15 23 42 / 0.04),
+      0 24px 64px -46px rgb(15 23 42 / 0.22),
+      inset 0 1px 0 rgb(255 255 255 / 0.82);
   }
 
   .hero-surface::before {
@@ -183,8 +203,8 @@
     inset: 0;
     border-radius: inherit;
     background-image:
-      linear-gradient(120deg, rgb(var(--color-accent) / 0.1), transparent 38%),
-      linear-gradient(180deg, rgb(255 255 255 / 0.34), transparent 42%);
+      linear-gradient(120deg, rgb(var(--color-accent) / 0.07), transparent 38%),
+      linear-gradient(180deg, rgb(255 255 255 / 0.72), transparent 42%);
     pointer-events: none;
     z-index: -1;
   }
@@ -195,12 +215,35 @@
     inset: 0;
     pointer-events: none;
     border-radius: inherit;
-    background:
-      linear-gradient(to right, rgb(var(--color-line) / 0.035) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(var(--color-line) / 0.035) 1px, transparent 1px);
+    background: none;
     background-size: 52px 52px;
     mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.18), transparent 72%);
     z-index: -1;
+  }
+
+  .dark .hero-surface {
+    background-image:
+      linear-gradient(120deg, rgb(var(--color-accent) / 0.08), transparent 42%),
+      linear-gradient(
+        135deg,
+        rgb(var(--color-surface) / 0.98),
+        rgb(var(--color-surface-muted) / 0.86)
+      );
+    box-shadow:
+      0 24px 70px rgb(15 23 42 / 0.08),
+      inset 0 1px 0 rgb(255 255 255 / 0.42);
+  }
+
+  .dark .hero-surface::before {
+    background-image:
+      linear-gradient(120deg, rgb(var(--color-accent) / 0.1), transparent 38%),
+      linear-gradient(180deg, rgb(255 255 255 / 0.34), transparent 42%);
+  }
+
+  .dark .hero-surface::after {
+    background:
+      linear-gradient(to right, rgb(var(--color-line) / 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--color-line) / 0.035) 1px, transparent 1px);
   }
 
   .hero-title {
@@ -306,11 +349,25 @@
   }
 
   .surface-frame {
-    @apply rounded-shell border border-line/[0.15] bg-surface/[0.85] shadow-panel backdrop-blur-sm;
+    @apply rounded-shell border border-line/[0.09] bg-surface shadow-none backdrop-blur-sm;
+    box-shadow:
+      0 1px 2px rgb(15 23 42 / 0.035),
+      0 20px 48px -42px rgb(15 23 42 / 0.2);
   }
 
   .surface-frame-strong {
-    @apply rounded-shell border border-line/[0.15] bg-surface-strong/[0.9] shadow-soft;
+    @apply rounded-shell border border-line/[0.1] bg-surface-muted/[0.96] shadow-none;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.82),
+      0 14px 36px -34px rgb(15 23 42 / 0.18);
+  }
+
+  .dark .surface-frame {
+    @apply border-line/[0.15] bg-surface/[0.85] shadow-panel;
+  }
+
+  .dark .surface-frame-strong {
+    @apply border-line/[0.15] bg-surface-strong/[0.9] shadow-soft;
   }
 
   .kicker-grid {

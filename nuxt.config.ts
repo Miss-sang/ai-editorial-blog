@@ -60,7 +60,7 @@ export default defineNuxtConfig({
         },
         {
           name: 'theme-color',
-          content: '#f4efe5'
+          content: '#f7f8fa'
         }
       ],
       link: [
