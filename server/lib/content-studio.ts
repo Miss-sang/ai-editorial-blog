@@ -564,6 +564,16 @@ function buildSeedProjects(now: string): StoredProject[] {
   })
 }
 
+const seedTopicDescriptions: Record<string, string> = {
+  'Vue 3 与 TypeScript': '组件设计、组合式 API、类型约束与工程实践。',
+  'HTML 与 CSS': '语义化结构、响应式布局与可访问性。',
+  'JavaScript / ES6+': '语言特性、异步流程与常见工程写法。',
+  浏览器原理: '渲染流程、缓存机制与性能排查。',
+  计算机网络: 'HTTP、缓存、跨域与网络请求排查。',
+  计算机基础: '进程、线程、内存与前端工程基础。',
+  'AI 工具与工作流': '模型平台、提示词和阅读辅助实践。'
+}
+
 function buildFallbackState(): StoredState {
   const topicsBySlug = new Map<string, StoredTopic>()
   const tagsBySlug = new Map<string, StoredTag>()
@@ -577,7 +587,9 @@ function buildFallbackState(): StoredState {
         id: randomUUID(),
         name: article.category,
         slug: topicSlug,
-        description: `${article.category} 相关的知识梳理与实践总结。`,
+        description:
+          seedTopicDescriptions[article.category] ||
+          `${article.category} 的文章归档与实践记录。`,
         createdAt: article.publishedAt || now,
         updatedAt: now
       }

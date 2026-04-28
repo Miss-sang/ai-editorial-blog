@@ -1,4 +1,0 @@
-interface:
-  display_name: "AI Blog Week 1 Foundation"
-  short_description: "Scaffold repo, tokens, layouts, and deploy baseline."
-  default_prompt: "Use this skill to complete week 1 foundation work for the AI technical blog project."

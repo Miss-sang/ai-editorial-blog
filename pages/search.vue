@@ -6,7 +6,7 @@ import { getFetchStatusMessage } from '~/utils/fetch-error'
 
 useSeoMeta({
   title: '搜索',
-  description: '按关键词检索文章、AI 内容和项目案例'
+  description: '按关键词检索文章、专题和项目'
 })
 
 const route = useRoute()
@@ -47,8 +47,8 @@ const searchErrorMessage = computed(() => {
   <div class="app-container app-section">
     <AppSectionHeading
       eyebrow="站内搜索"
-      title="用一个入口检索文章、AI 内容和项目案例"
-      description="搜索页会聚合已发布文章、公开项目和 AI 导航入口，便于快速定位内容"
+      title="用一个入口检索站内内容"
+      description="按标题、专题、标签或项目名称快速查找。"
       title-class="single-line-xl"
       description-class="single-line-xl"
     />
@@ -58,7 +58,7 @@ const searchErrorMessage = computed(() => {
         for="site-search-input"
         class="flex min-w-0 items-center gap-3 rounded-[1.75rem] border border-line/[0.15] bg-surface-muted/60 px-5 py-3.5"
       >
-        <span class="sr-only">搜索已发布文章、AI 内容和项目案例</span>
+        <span class="sr-only">搜索已发布文章、专题和项目</span>
         <Search class="size-5 text-accent" />
         <input
           id="site-search-input"
@@ -70,12 +70,11 @@ const searchErrorMessage = computed(() => {
         >
       </label>
       <p id="site-search-hint" class="body-copy single-line-lg">
-        可按专题、技术关键词、项目名称或 AI 相关词汇进行检索
+        可按标题、专题、标签或项目名称检索。
       </p>
       <div class="flex flex-wrap gap-2">
         <AppStatusPill>公共搜索接口</AppStatusPill>
-        <AppStatusPill tone="accent">文章 + AI + 项目</AppStatusPill>
-        <AppStatusPill>支持后续扩展语义检索</AppStatusPill>
+        <AppStatusPill tone="accent">文章 + 专题 + 项目</AppStatusPill>
         <AppStatusPill v-if="!searchErrorMessage">{{ resultCountLabel }}</AppStatusPill>
       </div>
     </AppSurface>
@@ -84,7 +83,7 @@ const searchErrorMessage = computed(() => {
       v-if="pending"
       class="mt-6"
       title="正在搜索内容"
-      description="正在按关键词匹配文章、AI 内容和项目案例"
+      description="正在按关键词匹配站内内容"
     />
 
     <AppErrorState

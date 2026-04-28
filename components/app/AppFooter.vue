@@ -42,7 +42,7 @@ const appConfig = useAppConfig()
             <AppStatusPill tone="accent">AI 阅读</AppStatusPill>
           </div>
           <p class="text-sm leading-6 text-ink-faint">
-            用于持续沉淀个人技术文章、项目案例和 AI 实践记录
+            个人中文技术博客，记录前端、后端与项目复盘。
           </p>
         </div>
       </div>

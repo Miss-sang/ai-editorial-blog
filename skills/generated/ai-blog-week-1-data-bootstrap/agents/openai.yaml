@@ -1,4 +1,0 @@
-interface:
-  display_name: "AI Blog Week 1 Data Bootstrap"
-  short_description: "Prepare Prisma, Supabase, and server-side config bootstrap."
-  default_prompt: "Use this skill to complete the data bootstrap slice of week 1 for the AI technical blog project."

@@ -1,4 +1,0 @@
-interface:
-  display_name: "AI Blog Release Deploy"
-  short_description: "Prepare, deploy, and smoke-test the blog release."
-  default_prompt: "Use $ai-blog-release-deploy to prepare environment variables, build the app, deploy it, and verify the live result."

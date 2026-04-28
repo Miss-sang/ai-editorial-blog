@@ -1,4 +1,0 @@
-interface:
-  display_name: "AI Blog Week 4 AI Integration"
-  short_description: "Add Longcat AI reading and writing features safely."
-  default_prompt: "Use this skill to complete week 4 AI integration work for the AI technical blog project."

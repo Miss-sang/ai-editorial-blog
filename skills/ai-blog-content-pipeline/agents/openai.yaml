@@ -1,4 +1,0 @@
-interface:
-  display_name: "AI Blog Content Pipeline"
-  short_description: "Unify admin write flow and public read flow."
-  default_prompt: "Use $ai-blog-content-pipeline to connect admin CRUD, database storage, and public content rendering into one real data pipeline."

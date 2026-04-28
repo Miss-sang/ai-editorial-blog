@@ -1,4 +1,0 @@
-interface:
-  display_name: "AI Blog Quality Gate"
-  short_description: "Run regression checks and block unstable releases."
-  default_prompt: "Use $ai-blog-quality-gate to verify permissions, layout, navigation, data flow, Chinese copy, and release readiness."

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowRight, BookOpen, BrainCircuit, FolderKanban, Layers3 } from 'lucide-vue-next'
+import { ArrowRight, BookOpen, FolderKanban, Layers3, Search } from 'lucide-vue-next'
 import type { HomePageResponse } from '~/types/home-page'
 import { formatDisplayDate } from '~/utils/display'
 import { getFetchStatusMessage } from '~/utils/fetch-error'
@@ -36,26 +36,30 @@ const homeErrorMessage = computed(() => {
 
 const siteTracks = [
   {
-    title: '前端内容主线',
-    detail: '围绕 Vue 3、TypeScript、HTML、CSS、ES6、组件协作、布局策略与工程化持续沉淀',
-    tags: ['Vue 3', 'TypeScript', 'HTML', 'CSS']
+    title: '前端',
+    detail: '记录界面实现、组件组织、浏览器问题与性能优化。',
+    tags: ['前端']
   },
   {
-    title: '后端与部署链路',
-    detail: '补齐接口设计、数据库建模、权限校验、对象存储、部署配置与运行状态检查',
-    tags: ['Node', '数据库', '权限', '部署']
-  },
-  {
-    title: '浏览器与计算机基础',
-    detail: '把渲染流程、缓存策略、网络请求、性能排查与计算机基础整理成可检索的知识结构',
-    tags: ['浏览器', '网络', '缓存', '性能']
-  },
-  {
-    title: 'GitHub 与项目履历',
-    detail: '逐步补入源码仓库、项目截图、功能拆解、技术选型与上线复盘，形成完整作品集',
-    tags: ['GitHub', '项目案例', '复盘', '作品集']
+    title: '后端',
+    detail: '记录接口设计、数据建模、权限校验、部署和内容管理链路。',
+    tags: ['后端']
   }
 ]
+
+const topicDescriptionByName: Record<string, string> = {
+  'Vue 3 与 TypeScript': '组件、组合式 API、类型约束与工程实践。',
+  'HTML 与 CSS': '语义化结构、响应式布局与可访问性。',
+  'JavaScript / ES6+': '语言特性、异步流程与常见工程写法。',
+  浏览器原理: '渲染流程、缓存机制与性能排查。',
+  计算机网络: 'HTTP、缓存、跨域与网络请求排查。',
+  计算机基础: '进程、线程、内存与前端工程基础。',
+  'AI 平台与工具': '模型平台、提示词和阅读辅助实践。'
+}
+
+const getTopicDescription = (topic: HomePageResponse['topics'][number]) => {
+  return topic.description || topicDescriptionByName[topic.name] || '收纳这一类文章和实践记录。'
+}
 </script>
 
 <template>
@@ -81,14 +85,14 @@ const siteTracks = [
           <AppSurface class="hero-surface flex h-full flex-col justify-between overflow-hidden">
             <div class="hero-stack space-y-7">
               <div class="space-y-3.5">
-                <AppStatusPill tone="accent">中文技术内容平台</AppStatusPill>
+                <AppStatusPill tone="accent">个人中文技术博客</AppStatusPill>
                 <div class="space-y-3.5">
-                  <p class="eyebrow">前端 / 计算机 / AI</p>
+                  <p class="eyebrow">前端 / 后端</p>
                   <h1 class="max-w-4xl hero-title">
                     {{ appConfig.site.headline }}
                   </h1>
                   <p class="max-w-3xl body-copy single-line-lg">
-                    聚合 Vue 3、TypeScript、HTML、CSS、ES6、浏览器、网络、计算机基础与 AI 内容，前后台共用一条内容数据链路
+                    记录开发中的问题、实现过程和项目复盘。
                   </p>
                 </div>
               </div>
@@ -98,14 +102,14 @@ const siteTracks = [
                   to="/articles"
                   class="inline-flex items-center justify-center gap-2 rounded-full bg-ink-strong px-5 py-3 text-sm text-canvas transition hover:bg-accent hover:text-[#08110d]"
                 >
-                  浏览文章归档
+                  阅读文章
                   <ArrowRight class="size-4" />
                 </NuxtLink>
                 <NuxtLink
                   to="/topics"
                   class="inline-flex items-center justify-center gap-2 rounded-full border border-line/[0.15] bg-surface-muted/60 px-5 py-3 text-sm text-ink-strong transition hover:border-accent/30 hover:text-accent"
                 >
-                  查看专题导航
+                  浏览专题
                 </NuxtLink>
               </div>
             </div>
@@ -128,7 +132,7 @@ const siteTracks = [
           <AppSurface class="flex h-full flex-col overflow-hidden border border-accent/10">
             <div class="border-b border-line/10 px-5 py-4">
               <p class="font-mono text-[11px] uppercase tracking-[0.26em] text-accent">
-                首页内容聚焦
+                首页焦点
               </p>
             </div>
             <div class="grid flex-1 content-start gap-5 px-5 py-6">
@@ -148,18 +152,18 @@ const siteTracks = [
                 </NuxtLink>
               </div>
 
-              <div v-if="data.aiArticles[0]" class="space-y-3 rounded-3xl border border-line/10 bg-surface-muted/45 p-5">
+              <div class="space-y-3 rounded-3xl border border-line/10 bg-surface-muted/45 p-5">
                 <div class="flex items-center gap-3">
-                  <BrainCircuit class="size-4 text-accent" />
-                  <p class="text-sm font-medium text-ink-strong">AI 相关文章</p>
+                  <Search class="size-4 text-accent" />
+                  <p class="text-sm font-medium text-ink-strong">站内搜索</p>
                 </div>
-                <h2 class="panel-title">{{ data.aiArticles[0].title }}</h2>
-                <p class="body-copy">{{ data.aiArticles[0].summary }}</p>
+                <h2 class="panel-title">快速找到文章、专题和项目</h2>
+                <p class="body-copy">按关键词检索标题、专题、标签和项目名称。</p>
                 <NuxtLink
-                  to="/labs"
+                  to="/search"
                   class="inline-flex items-center gap-2 text-sm text-accent transition hover:text-accent-warm"
                 >
-                  查看 AI 专区
+                  打开搜索
                   <ArrowRight class="size-4" />
                 </NuxtLink>
               </div>
@@ -187,8 +191,8 @@ const siteTracks = [
       <section class="app-container app-section">
         <AppSectionHeading
           eyebrow="平台主流程"
-          title="后台创建、数据库存储、前台展示，保持一致的数据链路"
-          description="后台录入后统一进入内容源，首页、专题、项目与搜索页同步读取"
+          title="后台写入，前台同步展示"
+          description="文章、专题、项目共用同一套内容数据。"
           title-class="single-line-lg"
           description-class="single-line-lg"
         />
@@ -196,17 +200,17 @@ const siteTracks = [
         <div class="mt-8 grid gap-5 lg:grid-cols-3">
           <AppSurface class="space-y-4">
             <AppStatusPill tone="accent">步骤一</AppStatusPill>
-            <h3 class="panel-title single-line-md">后台创建</h3>
+            <h3 class="panel-title single-line-md">内容创建</h3>
             <p class="body-copy">
-              在后台维护文章、专题、标签和项目，并控制草稿、审核与发布状态
+              维护文章、专题、标签和项目。
             </p>
           </AppSurface>
 
           <AppSurface class="space-y-4">
             <AppStatusPill tone="accent">步骤二</AppStatusPill>
-            <h3 class="panel-title single-line-md">数据库入库</h3>
+            <h3 class="panel-title single-line-md">统一入库</h3>
             <p class="body-copy">
-              生产环境以数据库为主数据源，避免首页、列表页和后台出现数据偏差
+              发布内容写入数据库或本地内容源。
             </p>
           </AppSurface>
 
@@ -214,7 +218,7 @@ const siteTracks = [
             <AppStatusPill tone="accent">步骤三</AppStatusPill>
             <h3 class="panel-title single-line-md">前台展示</h3>
             <p class="body-copy">
-              首页、专题页、标签页、项目页和搜索页读取同一套公共接口，保证展示一致
+              首页、专题、项目和搜索同步读取。
             </p>
           </AppSurface>
         </div>
@@ -223,8 +227,8 @@ const siteTracks = [
       <section class="app-container app-section">
         <AppSectionHeading
           eyebrow="站点介绍"
-          title="把前端、后端、基础知识与作品集整理成持续更新的中文技术站点"
-          description="首页之外还会继续扩充专题、项目履历、GitHub 作品集与 AI 阅读辅助，撑起完整的内容版面"
+          title="这里是我的个人技术博客"
+          description="主要记录前端、后端开发中的问题、实现过程和项目复盘。"
           title-class="single-line-xl"
           description-class="single-line-xl"
         />
@@ -251,8 +255,8 @@ const siteTracks = [
           <AppSurface class="space-y-6">
             <AppSectionHeading
               eyebrow="最新文章"
-              title="沉淀可检索、可复用的技术内容"
-              description="文章板块覆盖前端开发、浏览器网络知识、计算机基础与 AI 工具实践"
+              title="最新技术文章"
+              description="按时间展示最近发布的文章。"
               title-class="single-line-xl"
               description-class="single-line-xl"
             />
@@ -275,7 +279,7 @@ const siteTracks = [
             <AppEmptyState
               v-else
               title="暂时还没有已发布文章"
-              description="请先在后台创建并发布文章，首页会自动同步展示"
+              description="发布文章后会自动显示在这里。"
             />
           </AppSurface>
 
@@ -283,15 +287,27 @@ const siteTracks = [
             <AppSurface class="space-y-4">
               <div class="flex items-center gap-3">
                 <Layers3 class="size-5 text-accent" />
-                <h3 class="panel-title">热门专题</h3>
+                <h3 class="panel-title">专题栏目</h3>
               </div>
-              <div v-if="data.topics.length" class="flex flex-wrap gap-2">
-                <NuxtLink v-for="topic in data.topics" :key="topic.id" :to="`/topics/${topic.slug}`">
-                  <AppStatusPill tone="accent">{{ topic.name }}</AppStatusPill>
+              <div v-if="data.topics.length" class="divide-y divide-line/10">
+                <NuxtLink
+                  v-for="topic in data.topics"
+                  :key="topic.id"
+                  :to="`/topics/${topic.slug}`"
+                  class="block py-3 first:pt-0 last:pb-0"
+                >
+                  <div class="flex items-center justify-between gap-3">
+                    <h4 class="text-sm font-semibold text-ink-strong">{{ topic.name }}</h4>
+                    <span class="shrink-0 font-mono text-[11px] uppercase tracking-[0.18em] text-ink-faint">
+                      {{ topic.articleCount }} 篇
+                    </span>
+                  </div>
+                  <p class="mt-1 body-copy">{{ getTopicDescription(topic) }}</p>
                 </NuxtLink>
               </div>
+              <p v-else class="body-copy">暂无公开专题。</p>
               <p class="body-copy">
-                通过专题快速进入 Vue 3、HTML、CSS、JavaScript、浏览器、网络、计算机基础和 AI 内容
+                专题按文章分类组织，便于连续阅读。
               </p>
             </AppSurface>
 

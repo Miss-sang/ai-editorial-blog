@@ -1,4 +1,0 @@
-interface:
-  display_name: "AI Blog Program Manager"
-  short_description: "Route weekly AI blog build work and keep scope aligned."
-  default_prompt: "Use this skill to coordinate the current week of the AI technical blog project."

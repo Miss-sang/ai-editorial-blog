@@ -31,7 +31,7 @@ watch(
           <div class="hidden min-[480px]:block">
             <p class="single-line text-sm font-semibold text-ink-strong">{{ appConfig.site.name }}</p>
             <p class="single-line font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint">
-              前端 / 计算机 / AI
+              个人中文技术博客
             </p>
           </div>
         </NuxtLink>

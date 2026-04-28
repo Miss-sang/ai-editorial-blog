@@ -6,7 +6,7 @@ import { getFetchStatusMessage } from '~/utils/fetch-error'
 
 useSeoMeta({
   title: '文章',
-  description: '查看已发布的技术文章，覆盖前端、浏览器、网络、计算机基础与 AI 实践'
+  description: '查看已发布的技术文章，记录前端、后端开发问题与项目复盘'
 })
 
 const {
@@ -39,8 +39,8 @@ const restArticles = computed(() => {
   <div class="app-container app-section">
     <AppSectionHeading
       eyebrow="文章归档"
-      title="把前端、计算机与 AI 内容整理成可持续检索的中文文章库"
-      description="这里展示的文章全部来自后台内容链路，发布后前台会自动同步"
+      title="按时间整理技术文章"
+      description="发布后的文章会同步到归档、专题和搜索。"
       title-class="single-line-xl"
       description-class="single-line-xl"
     />
@@ -97,19 +97,19 @@ const restArticles = computed(() => {
         <p class="eyebrow">内容流转状态</p>
         <h2 class="panel-title single-line-md">文章列表已接入统一内容源</h2>
         <p class="body-copy">
-          前台文章归档、专题页和搜索页都会读取后台创建的已发布内容，不再依赖静态演示数据
+          文章归档、专题页和搜索页读取同一套已发布内容。
         </p>
         <div class="grid gap-3 pt-2">
           <div class="rounded-3xl border border-line/10 bg-surface-muted/50 p-4">
             <p class="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-faint">内容来源</p>
             <p class="mt-2 body-copy">
-              标题、摘要、正文、专题、标签和发布时间统一来自后台内容 API
+              标题、摘要、正文、专题、标签和发布时间来自后台内容 API。
             </p>
           </div>
           <div class="rounded-3xl border border-line/10 bg-surface-muted/50 p-4">
             <p class="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-faint">阅读入口</p>
             <p class="mt-2 body-copy">
-              可继续通过专题、标签和搜索入口横向检索相关技术内容
+              可通过专题、标签和搜索继续查找相关内容。
             </p>
           </div>
         </div>

@@ -1,4 +1,0 @@
-interface:
-  display_name: "AI Blog Content Taxonomy Seeding"
-  short_description: "Replace demo content with real technical taxonomy."
-  default_prompt: "Use $ai-blog-content-taxonomy-seeding to clean demo content, define technical categories, and seed the first real blog structure."

@@ -5,10 +5,10 @@ export const projects: ProjectItem[] = [
     id: 'proj-blog-platform',
     slug: 'zhizhan-tech-blog-platform',
     title: '知栈技术博客平台',
-    summary: '一个以前端体验为主导的技术内容平台，包含后台内容管理、数据库同步和 AI 阅读辅助',
+    summary: '个人中文技术博客，包含文章、专题、项目和后台内容管理。',
     status: 'Building',
     stack: ['Nuxt 3', 'TypeScript', 'Tailwind', 'Prisma', 'Supabase'],
-    impact: '承接文章、项目、专题、标签与 AI 阅读助手的完整业务链路'
+    impact: '承接文章发布、专题归档、项目记录与搜索入口'
   },
   {
     id: 'proj-browser-handbook',

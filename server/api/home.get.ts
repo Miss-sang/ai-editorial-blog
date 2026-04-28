@@ -35,17 +35,17 @@ export default defineEventHandler(async (): Promise<HomePageResponse> => {
       {
         label: '已发布文章',
         value: String(articles.length),
-        detail: '前台展示的文章全部来自真实内容链路。'
+        detail: '发布后的文章会同步到首页和归档。'
       },
       {
         label: '公开专题',
         value: String(topics.length),
-        detail: '围绕前端、浏览器、网络、计算机基础与 AI 平台组织内容。'
+        detail: '按文章分类整理阅读路径。'
       },
       {
         label: '项目案例',
         value: String(projects.length),
-        detail: '项目区承接仓库地址、案例说明与上线状态。'
+        detail: '记录案例说明、技术栈与上线状态。'
       }
     ],
     featuredArticle,

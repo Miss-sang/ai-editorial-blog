@@ -10,7 +10,8 @@ const databaseUrl = process.env.NUXT_DATABASE_URL || process.env.DATABASE_URL ||
 const publicSiteUrl = process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 const publicSiteName = process.env.NUXT_PUBLIC_SITE_NAME || '知栈技术博客'
 const publicSiteDescription =
-  process.env.NUXT_PUBLIC_SITE_DESCRIPTION || '聚焦前端、计算机基础、浏览器、网络与 AI 实践的中文技术博客'
+  process.env.NUXT_PUBLIC_SITE_DESCRIPTION ||
+  '个人中文技术博客，记录前端、后端开发中的问题、实现与项目复盘。'
 
 const supabaseServiceRoleKey =
   process.env.NUXT_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || ''
@@ -59,7 +60,7 @@ export default defineNuxtConfig({
         },
         {
           name: 'theme-color',
-          content: '#0f1720'
+          content: '#f4efe5'
         }
       ],
       link: [

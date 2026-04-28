@@ -1,4 +1,0 @@
-interface:
-  display_name: "AI Blog Admin Navigation Flow"
-  short_description: "Add return, preview, and fast-switch paths in admin."
-  default_prompt: "Use $ai-blog-admin-navigation-flow to improve admin-to-public navigation, preview links, and route switching."

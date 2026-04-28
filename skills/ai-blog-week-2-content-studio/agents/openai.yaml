@@ -1,4 +1,0 @@
-interface:
-  display_name: "AI Blog Week 2 Content Studio"
-  short_description: "Build content models, admin auth, uploads, and editing."
-  default_prompt: "Use this skill to complete week 2 content studio work for the AI technical blog project."

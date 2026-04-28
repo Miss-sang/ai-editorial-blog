@@ -36,8 +36,8 @@ const topicsErrorMessage = computed(() => {
   <div class="app-container app-section">
     <AppSectionHeading
       eyebrow="专题导航"
-      title="用更稳定的知识结构组织文章，而不是堆成长列表"
-      description="专题会把 Vue 3、HTML、CSS、JavaScript、浏览器、网络、计算机基础和 AI 内容串成清晰的阅读路径"
+      title="按文章分类浏览专题"
+      description="每个专题补充对应说明，便于连续阅读。"
       title-class="single-line-xl"
       description-class="single-line-xl"
     />
@@ -70,7 +70,7 @@ const topicsErrorMessage = computed(() => {
         </div>
         <h2 class="mt-4 panel-title">{{ topic.name }}</h2>
         <p class="mt-3 body-copy">
-          {{ topic.description || '用于组织相关技术内容的主知识专题' }}
+          {{ topic.description || '这一类文章的归档与实践记录。' }}
         </p>
         <p class="mt-4 font-mono text-[11px] uppercase tracking-[0.22em] text-ink-faint">
           进入专题

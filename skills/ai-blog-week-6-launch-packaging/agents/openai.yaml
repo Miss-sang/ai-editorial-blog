@@ -1,4 +1,0 @@
-interface:
-  display_name: "AI Blog Week 6 Launch Packaging"
-  short_description: "Finish launch polish, docs, demo prep, and interview packaging."
-  default_prompt: "Use this skill to complete week 6 launch packaging work for the AI technical blog project."
