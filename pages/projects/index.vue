@@ -14,7 +14,7 @@ const {
   pending,
   error,
   refresh
-} = await useFetch<ProjectRecord[]>('/api/projects', {
+} = useLazyFetch<ProjectRecord[]>('/api/projects', {
   default: () => []
 })
 

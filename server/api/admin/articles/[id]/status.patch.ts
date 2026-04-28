@@ -1,5 +1,5 @@
-import { createError, defineEventHandler, getRouterParam, readBody } from 'h3'
-import { updateArticleStatus } from '~/server/lib/content-studio'
+import { createError, defineEventHandler, getQuery, getRouterParam, readBody } from 'h3'
+import { toCompactAdminArticle, updateArticleStatus } from '~/server/lib/content-studio'
 import { requireAdminSession } from '~/server/utils/admin-session'
 import type { ArticleStatusActionPayload } from '~/types/content-studio'
 
@@ -24,5 +24,5 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  return article
+  return getQuery(event).compact === '1' ? toCompactAdminArticle(article) : article
 })

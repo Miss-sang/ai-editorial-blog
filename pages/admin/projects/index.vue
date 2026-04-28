@@ -25,7 +25,7 @@ const {
   pending,
   error,
   refresh
-} = await useFetch<ProjectRecord[]>('/api/admin/projects', {
+} = useLazyFetch<ProjectRecord[]>('/api/admin/projects', {
   default: () => []
 })
 
@@ -60,7 +60,7 @@ const handleDelete = async (project: ProjectRecord) => {
     await $fetch(`/api/admin/projects/${project.id}`, {
       method: 'DELETE'
     })
-    await refresh()
+    projects.value = projects.value.filter((item) => item.id !== project.id)
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : '删除项目失败'
   } finally {

@@ -14,7 +14,7 @@ const {
   pending,
   error,
   refresh
-} = await useFetch<ArticleRecord[]>('/api/articles', {
+} = useLazyFetch<ArticleRecord[]>('/api/articles', {
   default: () => []
 })
 

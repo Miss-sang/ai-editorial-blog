@@ -23,7 +23,7 @@ const {
   pending,
   error,
   refresh
-} = await useFetch<TopicRecord[]>('/api/topics', {
+} = useLazyFetch<TopicRecord[]>('/api/topics', {
   default: () => []
 })
 

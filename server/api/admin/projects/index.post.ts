@@ -6,5 +6,8 @@ import type { ProjectEditorPayload } from '~/types/content-studio'
 export default defineEventHandler(async (event) => {
   requireAdminSession(event)
   const body = await readBody<ProjectEditorPayload>(event)
-  return await createProject(body)
+  const project = await createProject(body)
+  return {
+    id: project.id
+  }
 })

@@ -9,9 +9,24 @@ const emptySession = (): AdminSessionState => ({
 export function useAdminSession() {
   const session = useState<AdminSessionState>('admin-session', emptySession)
   const pending = useState<boolean>('admin-session-pending', () => false)
+  const checked = useState<boolean>('admin-session-checked', () => false)
 
-  const refreshSession = async () => {
+  const waitForPendingSession = async () => {
+    while (pending.value) {
+      await new Promise((resolve) => window.setTimeout(resolve, 20))
+    }
+  }
+
+  const refreshSession = async (options: { force?: boolean } = {}) => {
+    if (checked.value && !options.force) {
+      return session.value
+    }
+
     if (pending.value) {
+      if (import.meta.client) {
+        await waitForPendingSession()
+      }
+
       return session.value
     }
 
@@ -22,8 +37,10 @@ export function useAdminSession() {
       session.value = await $fetch<AdminSessionState>('/api/admin/auth/session', {
         headers
       })
+      checked.value = true
     } catch {
       session.value = emptySession()
+      checked.value = true
     } finally {
       pending.value = false
     }
@@ -36,6 +53,7 @@ export function useAdminSession() {
       method: 'POST',
       body: payload
     })
+    checked.value = true
 
     return session.value
   }
@@ -46,11 +64,13 @@ export function useAdminSession() {
     })
 
     session.value = emptySession()
+    checked.value = true
   }
 
   return {
     session,
     pending,
+    checked,
     refreshSession,
     login,
     logout

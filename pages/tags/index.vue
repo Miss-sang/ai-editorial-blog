@@ -23,7 +23,7 @@ const {
   pending,
   error,
   refresh
-} = await useFetch<TagRecord[]>('/api/tags', {
+} = useLazyFetch<TagRecord[]>('/api/tags', {
   default: () => []
 })
 

@@ -15,7 +15,7 @@ const {
   pending,
   error,
   refresh
-} = await useFetch<ProjectRecord>(() => `/api/admin/projects/${projectId.value}`, {
+} = useLazyFetch<ProjectRecord>(() => `/api/admin/projects/${projectId.value}`, {
   watch: [projectId]
 })
 
@@ -36,11 +36,11 @@ const handleSave = async (payload: ProjectEditorPayload) => {
   actionError.value = ''
 
   try {
-    await $fetch(`/api/admin/projects/${projectId.value}`, {
+    const updatedProject = await $fetch<ProjectRecord>(`/api/admin/projects/${projectId.value}`, {
       method: 'PATCH',
       body: payload
     })
-    await refresh()
+    project.value = updatedProject
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : '保存项目失败'
   } finally {

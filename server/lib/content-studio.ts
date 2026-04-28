@@ -59,7 +59,7 @@ interface StoredArticle {
   slug: string
   summary: string
   excerpt: string
-  bodyMd: string
+  bodyMd?: string | null
   coverImageUrl: string
   readingTime: number
   status: ArticleRecord['status']
@@ -78,6 +78,12 @@ interface StoredState {
   topics: StoredTopic[]
   tags: StoredTag[]
   projects: StoredProject[]
+}
+
+interface PublicPromiseCache<T> {
+  expiresAt: number
+  promise?: Promise<T>
+  value?: T
 }
 
 interface PrismaTopicSource {
@@ -114,7 +120,7 @@ interface PrismaArticleSource {
   slug: string
   summary: string
   excerpt?: string | null
-  bodyMd: string
+  bodyMd?: string | null
   coverImageUrl?: string | null
   readingTime: number
   status: ArticleRecord['status']
@@ -491,7 +497,7 @@ function toArticleRecord(state: StoredState, article: StoredArticle): ArticleRec
     slug: article.slug,
     summary: article.summary,
     excerpt: article.excerpt,
-    bodyMd: article.bodyMd,
+    bodyMd: article.bodyMd ?? '',
     coverImageUrl: article.coverImageUrl,
     readingTime: article.readingTime,
     status: article.status,
@@ -515,7 +521,7 @@ function toDbArticleRecord(article: PrismaArticleSource): ArticleRecord {
     slug: article.slug,
     summary: article.summary,
     excerpt: article.excerpt ?? article.summary,
-    bodyMd: article.bodyMd,
+    bodyMd: article.bodyMd ?? '',
     coverImageUrl: article.coverImageUrl ?? '',
     readingTime: article.readingTime,
     status: article.status,
@@ -527,6 +533,24 @@ function toDbArticleRecord(article: PrismaArticleSource): ArticleRecord {
     seoDescription: article.seoDescription ?? article.summary,
     topic: article.topic ? toTopicRecordFromDb(article.topic) : null,
     tags: article.tags?.map((item) => toTagRecordFromDb(item.tag)) ?? []
+  }
+}
+
+function stripArticleBody(article: ArticleRecord): ArticleRecord {
+  return {
+    ...article,
+    bodyMd: ''
+  }
+}
+
+export function toCompactAdminArticle(article: ArticleRecord): ArticleRecord {
+  return stripArticleBody(article)
+}
+
+function stripProjectContent(project: ProjectRecord): ProjectRecord {
+  return {
+    ...project,
+    contentMd: ''
   }
 }
 
@@ -562,6 +586,51 @@ function buildSeedProjects(now: string): StoredProject[] {
       updatedAt: now
     }
   })
+}
+
+const PUBLIC_CONTENT_CACHE_MS = 60 * 1000
+
+const publicArticlesCache: PublicPromiseCache<ArticleRecord[]> = {
+  expiresAt: 0
+}
+
+const publicProjectsCache: PublicPromiseCache<ProjectRecord[]> = {
+  expiresAt: 0
+}
+
+export function clearPublicContentCache() {
+  for (const cache of [publicArticlesCache, publicProjectsCache]) {
+    cache.expiresAt = 0
+    cache.promise = undefined
+    cache.value = undefined
+  }
+}
+
+async function getCachedPublicValue<T>(
+  cache: PublicPromiseCache<T>,
+  loader: () => Promise<T>
+) {
+  const now = Date.now()
+
+  if (cache.value && cache.expiresAt > now) {
+    return cache.value
+  }
+
+  if (cache.promise) {
+    return cache.promise
+  }
+
+  cache.promise = loader()
+    .then((value) => {
+      cache.value = value
+      cache.expiresAt = Date.now() + PUBLIC_CONTENT_CACHE_MS
+      return value
+    })
+    .finally(() => {
+      cache.promise = undefined
+    })
+
+  return cache.promise
 }
 
 const seedTopicDescriptions: Record<string, string> = {
@@ -766,6 +835,7 @@ async function readFallbackState() {
 }
 
 async function writeFallbackState(state: StoredState) {
+  clearPublicContentCache()
   memoryFallbackState = state
 
   if (!canUseLocalFallbackStore) {
@@ -1030,7 +1100,21 @@ export async function listAdminArticles() {
   const dbArticles = await runWithPrisma(async (prisma) => {
     const records = await prisma.article.findMany({
       orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
-      include: {
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        summary: true,
+        excerpt: true,
+        coverImageUrl: true,
+        readingTime: true,
+        status: true,
+        isFeatured: true,
+        publishedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        seoTitle: true,
+        seoDescription: true,
         topic: true,
         tags: {
           include: {
@@ -1040,7 +1124,7 @@ export async function listAdminArticles() {
       }
     })
 
-    return records.map(toDbArticleRecord)
+    return records.map(toDbArticleRecord).map(stripArticleBody)
   })
 
   if (dbArticles) {
@@ -1051,7 +1135,7 @@ export async function listAdminArticles() {
   return state.articles
     .slice()
     .sort(compareRecentItems)
-    .map((article) => toArticleRecord(state, article))
+    .map((article) => stripArticleBody(toArticleRecord(state, article)))
 }
 
 export async function getAdminArticleById(id: string) {
@@ -1111,8 +1195,10 @@ export async function getPublicArticleBySlug(slug: string) {
 }
 
 export async function listPublicArticles() {
-  const articles = await listAdminArticles()
-  return articles.filter((article) => article.status === 'PUBLISHED')
+  return await getCachedPublicValue(publicArticlesCache, async () => {
+    const articles = await listAdminArticles()
+    return articles.filter((article) => article.status === 'PUBLISHED')
+  })
 }
 
 export async function listPublicTopics() {
@@ -1367,6 +1453,7 @@ export async function createArticle(payload: ArticleEditorPayload) {
   })
 
   if (dbArticle) {
+    clearPublicContentCache()
     return dbArticle
   }
 
@@ -1502,6 +1589,7 @@ export async function updateArticle(id: string, payload: ArticleEditorPayload) {
   })
 
   if (dbArticle) {
+    clearPublicContentCache()
     return dbArticle
   }
 
@@ -1593,6 +1681,7 @@ export async function updateArticleStatus(id: string, action: ArticleStatusActio
   })
 
   if (dbArticle) {
+    clearPublicContentCache()
     return dbArticle
   }
 
@@ -1636,6 +1725,9 @@ export async function deleteArticle(id: string) {
   })
 
   if (dbDeleted !== null) {
+    if (dbDeleted) {
+      clearPublicContentCache()
+    }
     return dbDeleted
   }
 
@@ -1715,6 +1807,7 @@ export async function createTopic(payload: TopicEditorPayload) {
   })
 
   if (dbTopic) {
+    clearPublicContentCache()
     return dbTopic
   }
 
@@ -1779,6 +1872,7 @@ export async function updateTopic(id: string, payload: TopicEditorPayload) {
   })
 
   if (dbTopic) {
+    clearPublicContentCache()
     return dbTopic
   }
 
@@ -1836,6 +1930,9 @@ export async function deleteTopic(id: string) {
   })
 
   if (dbDeleted !== null) {
+    if (dbDeleted) {
+      clearPublicContentCache()
+    }
     return dbDeleted
   }
 
@@ -1923,6 +2020,7 @@ export async function createTag(payload: TagEditorPayload) {
   })
 
   if (dbTag) {
+    clearPublicContentCache()
     return dbTag
   }
 
@@ -1987,6 +2085,7 @@ export async function updateTag(id: string, payload: TagEditorPayload) {
   })
 
   if (dbTag) {
+    clearPublicContentCache()
     return dbTag
   }
 
@@ -2048,6 +2147,9 @@ export async function deleteTag(id: string) {
   })
 
   if (dbDeleted !== null) {
+    if (dbDeleted) {
+      clearPublicContentCache()
+    }
     return dbDeleted
   }
 
@@ -2074,10 +2176,24 @@ export async function deleteTag(id: string) {
 export async function listAdminProjects() {
   const dbProjects = await runWithPrisma(async (prisma) => {
     const records = await prisma.project.findMany({
-      orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }]
+      orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        summary: true,
+        stack: true,
+        repoUrl: true,
+        demoUrl: true,
+        status: true,
+        isFeatured: true,
+        publishedAt: true,
+        createdAt: true,
+        updatedAt: true
+      }
     })
 
-    return records.map(toProjectRecordFromDb).sort(sortProjects)
+    return records.map(toProjectRecordFromDb).map(stripProjectContent).sort(sortProjects)
   })
 
   if (dbProjects) {
@@ -2085,12 +2201,14 @@ export async function listAdminProjects() {
   }
 
   const state = await readFallbackState()
-  return state.projects.map(toProjectRecordFromStored).sort(sortProjects)
+  return state.projects.map(toProjectRecordFromStored).map(stripProjectContent).sort(sortProjects)
 }
 
 export async function listPublicProjects() {
-  const projects = await listAdminProjects()
-  return projects.filter((project) => project.status !== 'ARCHIVED' || project.isFeatured)
+  return await getCachedPublicValue(publicProjectsCache, async () => {
+    const projects = await listAdminProjects()
+    return projects.filter((project) => project.status !== 'ARCHIVED' || project.isFeatured)
+  })
 }
 
 export async function getAdminProjectById(id: string) {
@@ -2153,6 +2271,7 @@ export async function createProject(payload: ProjectEditorPayload) {
   })
 
   if (dbProject) {
+    clearPublicContentCache()
     return dbProject
   }
 
@@ -2241,6 +2360,7 @@ export async function updateProject(id: string, payload: ProjectEditorPayload) {
   })
 
   if (dbProject) {
+    clearPublicContentCache()
     return dbProject
   }
 
@@ -2306,6 +2426,9 @@ export async function deleteProject(id: string) {
   })
 
   if (dbDeleted !== null) {
+    if (dbDeleted) {
+      clearPublicContentCache()
+    }
     return dbDeleted
   }
 
@@ -2341,11 +2464,35 @@ export async function getContentDashboard(
 
   const dbDashboard = await runWithPrisma(
     async (prisma) => {
-      const [articles, topics, tags, projects] = await Promise.all([
+      const [
+        articles,
+        topics,
+        tags,
+        projects,
+        totalArticles,
+        draftArticles,
+        publishedArticles,
+        archivedArticles,
+        projectCount
+      ] = await Promise.all([
         prisma.article.findMany({
           orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
           take: 4,
-          include: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            summary: true,
+            excerpt: true,
+            coverImageUrl: true,
+            readingTime: true,
+            status: true,
+            isFeatured: true,
+            publishedAt: true,
+            createdAt: true,
+            updatedAt: true,
+            seoTitle: true,
+            seoDescription: true,
             topic: true,
             tags: {
               include: {
@@ -2380,27 +2527,40 @@ export async function getContentDashboard(
         }),
         prisma.project.findMany({
           orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
-          take: 3
-        })
+          take: 3,
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            summary: true,
+            stack: true,
+            repoUrl: true,
+            demoUrl: true,
+            status: true,
+            isFeatured: true,
+            publishedAt: true,
+            createdAt: true,
+            updatedAt: true
+          }
+        }),
+        prisma.article.count(),
+        prisma.article.count({
+          where: {
+            status: 'DRAFT'
+          }
+        }),
+        prisma.article.count({
+          where: {
+            status: 'PUBLISHED'
+          }
+        }),
+        prisma.article.count({
+          where: {
+            status: 'ARCHIVED'
+          }
+        }),
+        prisma.project.count()
       ])
-
-      const totalArticles = await prisma.article.count()
-      const draftArticles = await prisma.article.count({
-        where: {
-          status: 'DRAFT'
-        }
-      })
-      const publishedArticles = await prisma.article.count({
-        where: {
-          status: 'PUBLISHED'
-        }
-      })
-      const archivedArticles = await prisma.article.count({
-        where: {
-          status: 'ARCHIVED'
-        }
-      })
-      const projectCount = await prisma.project.count()
 
       return {
         stats: {
@@ -2412,8 +2572,8 @@ export async function getContentDashboard(
           topicCount: topics.length,
           projectCount
         },
-        recentArticles: articles.map(toDbArticleRecord),
-        recentProjects: projects.map(toProjectRecordFromDb).sort(sortProjects),
+        recentArticles: articles.map(toDbArticleRecord).map(stripArticleBody),
+        recentProjects: projects.map(toProjectRecordFromDb).map(stripProjectContent).sort(sortProjects),
         topics: topics.map(toTopicRecordFromDb),
         tags: tags.map(toTagRecordFromDb),
         storage: getStorageState()
@@ -2453,9 +2613,10 @@ export async function getContentDashboard(
       .slice()
       .sort(compareRecentItems)
       .slice(0, 4)
-      .map((article) => toArticleRecord(state, article)),
+      .map((article) => stripArticleBody(toArticleRecord(state, article))),
     recentProjects: state.projects
       .map(toProjectRecordFromStored)
+      .map(stripProjectContent)
       .sort(sortProjects)
       .slice(0, 3),
     topics: state.topics

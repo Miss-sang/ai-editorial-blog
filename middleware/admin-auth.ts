@@ -5,9 +5,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return
   }
 
-  const { session, refreshSession } = useAdminSession()
+  const { checked, session, refreshSession } = useAdminSession()
 
-  if (!session.value.authenticated) {
+  if (!checked.value) {
     await refreshSession()
   }
 

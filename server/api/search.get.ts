@@ -135,10 +135,10 @@ export default defineEventHandler(async (event): Promise<SearchResponse> => {
     entries: filteredEntries
   }
 
-  await recordSearchQuery(event, {
+  void recordSearchQuery(event, {
     query: rawQuery,
     resultCount: response.total
-  })
+  }).catch(() => undefined)
 
   return response
 })

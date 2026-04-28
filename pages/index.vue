@@ -16,7 +16,7 @@ const {
   pending,
   error,
   refresh
-} = await useFetch<HomePageResponse>('/api/home', {
+} = useLazyFetch<HomePageResponse>('/api/home', {
   default: () => ({
     metrics: [],
     featuredArticle: null,
@@ -64,23 +64,15 @@ const getTopicDescription = (topic: HomePageResponse['topics'][number]) => {
 
 <template>
   <div>
-    <AppLoadingState
-      v-if="pending"
-      class="app-container app-section"
-      title="正在加载首页内容"
-      description="首页正在从公共内容接口获取最新文章、项目和专题数据"
-    />
-
     <AppErrorState
-      v-else-if="error"
+      v-if="error"
       class="app-container app-section"
       title="首页加载失败"
       :description="homeErrorMessage"
       @action="refresh"
     />
 
-    <template v-else>
-      <section class="app-container py-4 md:py-6">
+    <section class="app-container py-4 md:py-6" :aria-busy="pending ? 'true' : 'false'">
         <div class="grid min-h-[calc(100svh-7rem)] gap-6 xl:grid-cols-[1.15fr_0.85fr]">
           <AppSurface class="hero-surface flex h-full flex-col justify-between overflow-hidden">
             <div class="hero-stack space-y-7">
@@ -331,7 +323,6 @@ const getTopicDescription = (topic: HomePageResponse['topics'][number]) => {
             </AppSurface>
           </div>
         </div>
-      </section>
-    </template>
+    </section>
   </div>
 </template>

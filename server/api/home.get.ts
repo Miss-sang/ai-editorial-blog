@@ -4,6 +4,7 @@ import {
   listPublicProjects,
   listPublicTopics
 } from '~/server/lib/content-studio'
+import { setPublicContentCacheHeaders } from '~/server/utils/public-cache'
 import type { HomePageResponse } from '~/types/home-page'
 
 function isAiRelatedArticle(title: string, topicName?: string | null, tags: string[] = []) {
@@ -13,7 +14,9 @@ function isAiRelatedArticle(title: string, topicName?: string | null, tags: stri
   )
 }
 
-export default defineEventHandler(async (): Promise<HomePageResponse> => {
+export default defineEventHandler(async (event): Promise<HomePageResponse> => {
+  setPublicContentCacheHeaders(event)
+
   const [articles, projects, topics] = await Promise.all([
     listPublicArticles(),
     listPublicProjects(),

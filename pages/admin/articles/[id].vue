@@ -21,7 +21,7 @@ const {
   pending: articlePending,
   error: articleError,
   refresh: refreshArticle
-} = await useFetch<ArticleRecord>(() => `/api/admin/articles/${articleId.value}`, {
+} = useLazyFetch<ArticleRecord>(() => `/api/admin/articles/${articleId.value}`, {
   watch: [articleId]
 })
 
@@ -30,7 +30,7 @@ const {
   pending: metaPending,
   error: metaError,
   refresh: refreshMeta
-} = await useFetch<{
+} = useLazyFetch<{
   topics: TopicRecord[]
   tags: TagRecord[]
 }>('/api/admin/meta', {
@@ -71,11 +71,12 @@ const handleSave = async (payload: ArticleEditorPayload) => {
   actionError.value = ''
 
   try {
-    await $fetch(`/api/admin/articles/${articleId.value}`, {
+    const updatedArticle = await $fetch<ArticleRecord>(`/api/admin/articles/${articleId.value}`, {
       method: 'PATCH',
       body: payload
     })
-    await Promise.all([refreshArticle(), refreshMeta()])
+    article.value = updatedArticle
+    void refreshMeta()
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : '保存文章失败'
   } finally {
@@ -88,13 +89,13 @@ const handleStatusAction = async (action: ArticleStatusAction) => {
   actionError.value = ''
 
   try {
-    await $fetch(`/api/admin/articles/${articleId.value}/status`, {
+    const updatedArticle = await $fetch<ArticleRecord>(`/api/admin/articles/${articleId.value}/status`, {
       method: 'PATCH',
       body: {
         action
       }
     })
-    await refreshArticle()
+    article.value = updatedArticle
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : '更新文章状态失败'
   } finally {

@@ -22,19 +22,19 @@ useSeoMeta({
 const {
   data: bootstrap,
   refresh: refreshBootstrap
-} = await useFetch('/api/system/status')
+} = useLazyFetch('/api/system/status')
 const {
   data: dashboard,
   pending: dashboardPending,
   error: dashboardError,
   refresh: refreshDashboard
-} = await useFetch<DashboardResponse>('/api/admin/dashboard')
+} = useLazyFetch<DashboardResponse>('/api/admin/dashboard')
 const {
   data: telemetry,
   pending: telemetryPending,
   error: telemetryError,
   refresh: refreshTelemetry
-} = await useFetch<TelemetrySummaryResponse>('/api/admin/telemetry/summary')
+} = useLazyFetch<TelemetrySummaryResponse>('/api/admin/telemetry/summary')
 
 const dashboardErrorMessage = computed(() => {
   return getFetchStatusMessage(dashboardError.value) || '后台概览暂时无法加载'

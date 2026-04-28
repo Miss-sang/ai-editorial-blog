@@ -1,15 +1,15 @@
 import { defineEventHandler } from 'h3'
-import { getContentDashboard } from '~/server/lib/content-studio'
+import { listAdminTags, listAdminTopics } from '~/server/lib/content-studio'
 import { articleStatusOptions } from '~/types/content-studio'
 import { requireAdminSession } from '~/server/utils/admin-session'
 
 export default defineEventHandler(async (event) => {
   requireAdminSession(event)
-  const dashboard = await getContentDashboard()
+  const [topics, tags] = await Promise.all([listAdminTopics(), listAdminTags()])
 
   return {
-    topics: dashboard.topics,
-    tags: dashboard.tags,
+    topics,
+    tags,
     statuses: articleStatusOptions
   }
 })

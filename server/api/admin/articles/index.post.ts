@@ -6,5 +6,8 @@ import type { ArticleEditorPayload } from '~/types/content-studio'
 export default defineEventHandler(async (event) => {
   requireAdminSession(event)
   const body = await readBody<ArticleEditorPayload>(event)
-  return await createArticle(body)
+  const article = await createArticle(body)
+  return {
+    id: article.id
+  }
 })

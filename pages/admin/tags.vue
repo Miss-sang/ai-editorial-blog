@@ -17,7 +17,7 @@ const {
   pending,
   error,
   refresh
-} = await useFetch<TagRecord[]>('/api/admin/tags', {
+} = useLazyFetch<TagRecord[]>('/api/admin/tags', {
   default: () => []
 })
 
@@ -30,16 +30,19 @@ const savingId = ref('')
 const deletingId = ref('')
 const actionError = ref('')
 
+const sortTags = (items: TagRecord[]) =>
+  items.slice().sort((left, right) => left.name.localeCompare(right.name))
+
 const handleCreate = async (payload: TagEditorPayload) => {
   creating.value = true
   actionError.value = ''
 
   try {
-    await $fetch('/api/admin/tags', {
+    const tag = await $fetch<TagRecord>('/api/admin/tags', {
       method: 'POST',
       body: payload
     })
-    await refresh()
+    tags.value = sortTags([...(tags.value || []), tag])
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : '创建标签失败'
   } finally {
@@ -52,11 +55,11 @@ const handleUpdate = async (id: string, payload: TagEditorPayload) => {
   actionError.value = ''
 
   try {
-    await $fetch(`/api/admin/tags/${id}`, {
+    const tag = await $fetch<TagRecord>(`/api/admin/tags/${id}`, {
       method: 'PATCH',
       body: payload
     })
-    await refresh()
+    tags.value = sortTags((tags.value || []).map((item) => (item.id === id ? tag : item)))
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : '更新标签失败'
   } finally {
@@ -78,7 +81,7 @@ const handleDelete = async (id: string) => {
     await $fetch(`/api/admin/tags/${id}`, {
       method: 'DELETE'
     })
-    await refresh()
+    tags.value = (tags.value || []).filter((item) => item.id !== id)
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : '删除标签失败'
   } finally {

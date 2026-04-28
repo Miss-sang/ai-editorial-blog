@@ -17,7 +17,7 @@ const {
   pending,
   error: metaError,
   refresh
-} = await useFetch<{
+} = useLazyFetch<{
   topics: TopicRecord[]
   tags: TagRecord[]
 }>('/api/admin/meta', {
@@ -43,7 +43,6 @@ const handleCreate = async (payload: ArticleEditorPayload) => {
       method: 'POST',
       body: payload
     })
-    await refresh()
     await navigateTo(`/admin/articles/${article.id}`)
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : '创建文章失败'

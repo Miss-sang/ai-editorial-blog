@@ -17,7 +17,7 @@ const {
   pending,
   error,
   refresh
-} = await useFetch<TopicRecord[]>('/api/admin/topics', {
+} = useLazyFetch<TopicRecord[]>('/api/admin/topics', {
   default: () => []
 })
 
@@ -30,16 +30,19 @@ const savingId = ref('')
 const deletingId = ref('')
 const actionError = ref('')
 
+const sortTopics = (items: TopicRecord[]) =>
+  items.slice().sort((left, right) => left.name.localeCompare(right.name))
+
 const handleCreate = async (payload: TopicEditorPayload) => {
   creating.value = true
   actionError.value = ''
 
   try {
-    await $fetch('/api/admin/topics', {
+    const topic = await $fetch<TopicRecord>('/api/admin/topics', {
       method: 'POST',
       body: payload
     })
-    await refresh()
+    topics.value = sortTopics([...(topics.value || []), topic])
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : '创建专题失败'
   } finally {
@@ -52,11 +55,13 @@ const handleUpdate = async (id: string, payload: TopicEditorPayload) => {
   actionError.value = ''
 
   try {
-    await $fetch(`/api/admin/topics/${id}`, {
+    const topic = await $fetch<TopicRecord>(`/api/admin/topics/${id}`, {
       method: 'PATCH',
       body: payload
     })
-    await refresh()
+    topics.value = sortTopics(
+      (topics.value || []).map((item) => (item.id === id ? topic : item))
+    )
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : '更新专题失败'
   } finally {
@@ -78,7 +83,7 @@ const handleDelete = async (id: string) => {
     await $fetch(`/api/admin/topics/${id}`, {
       method: 'DELETE'
     })
-    await refresh()
+    topics.value = (topics.value || []).filter((item) => item.id !== id)
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : '删除专题失败'
   } finally {

@@ -12,16 +12,35 @@ useSeoMeta({
 const route = useRoute()
 const query = ref(String(route.query.q || ''))
 const normalizedQuery = computed(() => query.value.trim())
+const debouncedQuery = ref(normalizedQuery.value)
 const requestQuery = computed(() => ({
-  q: normalizedQuery.value
+  q: debouncedQuery.value
 }))
+
+let searchDebounceTimer: ReturnType<typeof setTimeout> | undefined
+
+watch(normalizedQuery, (value) => {
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer)
+  }
+
+  searchDebounceTimer = setTimeout(() => {
+    debouncedQuery.value = value
+  }, 250)
+})
+
+onBeforeUnmount(() => {
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer)
+  }
+})
 
 const {
   data: searchResponse,
   pending,
   error,
   refresh
-} = await useFetch<SearchResponse>('/api/search', {
+} = useLazyFetch<SearchResponse>('/api/search', {
   query: requestQuery,
   watch: [requestQuery],
   default: () => ({

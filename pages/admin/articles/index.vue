@@ -25,7 +25,7 @@ const {
   pending,
   error,
   refresh
-} = await useFetch<ArticleRecord[]>('/api/admin/articles', {
+} = useLazyFetch<ArticleRecord[]>('/api/admin/articles', {
   default: () => []
 })
 
@@ -61,7 +61,7 @@ const handleDelete = async (article: ArticleRecord) => {
     await $fetch(`/api/admin/articles/${article.id}`, {
       method: 'DELETE'
     })
-    await refresh()
+    articles.value = articles.value.filter((item) => item.id !== article.id)
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : '删除文章失败'
   } finally {
@@ -74,13 +74,18 @@ const handleStatusAction = async (article: ArticleRecord, action: ArticleStatusA
   actionError.value = ''
 
   try {
-    await $fetch(`/api/admin/articles/${article.id}/status`, {
+    const updatedArticle = await $fetch<ArticleRecord>(`/api/admin/articles/${article.id}/status`, {
       method: 'PATCH',
+      query: {
+        compact: '1'
+      },
       body: {
         action
       }
     })
-    await refresh()
+    articles.value = articles.value.map((item) =>
+      item.id === updatedArticle.id ? updatedArticle : item
+    )
   } catch (error) {
     actionError.value = error instanceof Error ? error.message : '更新文章状态失败'
   } finally {

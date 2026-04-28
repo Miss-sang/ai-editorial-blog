@@ -1,7 +1,9 @@
 import { createError, defineEventHandler, getRouterParam } from 'h3'
 import { getPublicArticleBySlug, listRelatedArticles } from '~/server/lib/content-studio'
+import { setPublicContentCacheHeaders } from '~/server/utils/public-cache'
 
 export default defineEventHandler(async (event) => {
+  setPublicContentCacheHeaders(event)
   const slug = getRouterParam(event, 'slug')
 
   if (!slug) {
