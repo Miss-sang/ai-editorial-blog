@@ -15,23 +15,37 @@ const route = useRoute()
 const config = useRuntimeConfig()
 const slug = computed(() => String(route.params.slug || ''))
 const articleBodyRef = ref<HTMLElement | null>(null)
+const articleContentColumnRef = ref<HTMLElement | null>(null)
+const articleSideRailRef = ref<HTMLElement | null>(null)
+const articleBodyMaxHeight = ref('')
 const selectedText = ref('')
+const articleBodyScrollStyle = computed(() =>
+  articleBodyMaxHeight.value
+    ? {
+        maxHeight: articleBodyMaxHeight.value
+      }
+    : undefined
+)
+const desktopArticleLayoutWidth = 1280
+const minimumArticleBodyHeight = 360
+let articleLayoutResizeObserver: ResizeObserver | null = null
+let articleLayoutFrame: number | null = null
 
-const { data: article, error } = await useFetch<ArticleRecord>(() => `/api/articles/${slug.value}`, {
-  watch: [slug]
-})
+const { data: article, error } = await useFetch<ArticleRecord>(
+  () => `/api/articles/${slug.value}`,
+  {
+    watch: [slug]
+  }
+)
 
 const {
   data: relatedArticles,
   error: relatedError,
   refresh: refreshRelated
-} = await useFetch<ArticleRecord[]>(
-  () => `/api/articles/${slug.value}/related`,
-  {
-    watch: [slug],
-    default: () => []
-  }
-)
+} = await useFetch<ArticleRecord[]>(() => `/api/articles/${slug.value}/related`, {
+  watch: [slug],
+  default: () => []
+})
 
 if (error.value) {
   throw createError({
@@ -108,7 +122,7 @@ const canonicalUrl = computed(() => {
 
 const visibleRelatedArticles = computed(() => {
   return (relatedArticles.value || [])
-    .filter((item) => item.id !== article.value?.id)
+    .filter((item: ArticleRecord) => item.id !== article.value?.id)
     .slice(0, 3)
 })
 
@@ -141,12 +155,68 @@ function syncSelectedText() {
   selectedText.value = text.slice(0, 600)
 }
 
+function updateArticleBodyMaxHeight() {
+  const body = articleBodyRef.value
+  const sideRail = articleSideRailRef.value
+
+  if (!import.meta.client || !body || !sideRail || window.innerWidth < desktopArticleLayoutWidth) {
+    articleBodyMaxHeight.value = ''
+    return
+  }
+
+  const bodyRect = body.getBoundingClientRect()
+  const sideRailBottom =
+    sideRail.lastElementChild?.getBoundingClientRect().bottom ??
+    sideRail.getBoundingClientRect().bottom
+  const contentPanel = body.parentElement
+  const contentPanelStyle = contentPanel ? window.getComputedStyle(contentPanel) : null
+  const panelPaddingBottom = contentPanelStyle
+    ? Number.parseFloat(contentPanelStyle.paddingBottom) || 0
+    : 0
+  const availableHeight = Math.floor(sideRailBottom - bodyRect.top - panelPaddingBottom)
+  const nextHeight = `${Math.max(availableHeight, minimumArticleBodyHeight)}px`
+
+  if (articleBodyMaxHeight.value !== nextHeight) {
+    articleBodyMaxHeight.value = nextHeight
+  }
+}
+
+function scheduleArticleBodyLayout() {
+  if (!import.meta.client || articleLayoutFrame !== null) {
+    return
+  }
+
+  articleLayoutFrame = window.requestAnimationFrame(() => {
+    articleLayoutFrame = null
+    updateArticleBodyMaxHeight()
+  })
+}
+
 onMounted(() => {
   document.addEventListener('selectionchange', syncSelectedText)
+
+  window.addEventListener('resize', scheduleArticleBodyLayout)
+  scheduleArticleBodyLayout()
+
+  if ('ResizeObserver' in window) {
+    articleLayoutResizeObserver = new ResizeObserver(scheduleArticleBodyLayout)
+
+    for (const target of [articleContentColumnRef.value, articleSideRailRef.value]) {
+      if (target) {
+        articleLayoutResizeObserver.observe(target)
+      }
+    }
+  }
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('selectionchange', syncSelectedText)
+  window.removeEventListener('resize', scheduleArticleBodyLayout)
+  articleLayoutResizeObserver?.disconnect()
+
+  if (articleLayoutFrame !== null) {
+    window.cancelAnimationFrame(articleLayoutFrame)
+  }
 })
 
 watch(
@@ -154,6 +224,7 @@ watch(
   () => {
     if (import.meta.client) {
       clearSelectedText()
+      nextTick(scheduleArticleBodyLayout)
     } else {
       selectedText.value = ''
     }
@@ -180,8 +251,8 @@ useHead(() => ({
 
 <template>
   <div v-if="article" class="app-container app-section">
-    <div class="grid gap-6 xl:grid-cols-[1.05fr_0.55fr]">
-      <div class="space-y-6">
+    <div class="grid gap-6 xl:grid-cols-[1.05fr_0.55fr] xl:items-start">
+      <div ref="articleContentColumnRef" class="space-y-6">
         <AppSurface class="space-y-5">
           <div class="flex flex-wrap gap-2">
             <NuxtLink v-if="article.topic" :to="`/topics/${article.topic.slug}`">
@@ -194,7 +265,9 @@ useHead(() => ({
             </AppStatusPill>
           </div>
           <div class="space-y-4">
-            <h1 class="max-w-4xl text-[2.4rem] font-semibold leading-[1.04] tracking-tight md:text-[3.3rem]">
+            <h1
+              class="max-w-4xl text-[2.4rem] font-semibold leading-[1.04] tracking-tight md:text-[3.3rem]"
+            >
               {{ article.title }}
             </h1>
             <p class="max-w-3xl body-copy">
@@ -210,12 +283,11 @@ useHead(() => ({
 
         <AppSurface class="space-y-5">
           <p class="eyebrow">正文内容</p>
-          <p class="body-copy">
-            在正文中选中一段文字后，可直接发送给 AI 阅读助手进行解释
-          </p>
+          <p class="body-copy">在正文中选中一段文字后，可直接发送给 AI 阅读助手进行解释</p>
           <div
             ref="articleBodyRef"
-            class="markdown-content"
+            class="markdown-content article-body-scroll panel-scroll"
+            :style="articleBodyScrollStyle"
             v-html="bodyHtml"
           />
         </AppSurface>
@@ -258,7 +330,7 @@ useHead(() => ({
         </AppSurface>
       </div>
 
-      <div class="space-y-6">
+      <div ref="articleSideRailRef" class="space-y-6">
         <AppSurface class="space-y-4">
           <p class="eyebrow">阅读信息</p>
           <div class="flex items-start gap-3">
