@@ -20,37 +20,37 @@ watch(
 
 <template>
   <header
-    class="sticky top-0 z-40 border-b border-line/10 bg-surface/90 shadow-[0_1px_0_rgb(15_23_42_/_0.03)] backdrop-blur-xl dark:bg-canvas/75 dark:shadow-none"
+    class="sticky top-0 z-40 border-b border-line/[0.12] bg-canvas/90 backdrop-blur-xl dark:bg-canvas/[0.82]"
   >
-    <div class="mx-auto w-full max-w-[1400px] px-4 md:px-6 xl:px-8">
-      <div class="flex h-[68px] items-center gap-3 xl:gap-3.5">
-        <NuxtLink to="/" class="flex shrink-0 items-center gap-3">
+    <div class="mx-auto w-full max-w-[1080px] px-4 sm:px-6">
+      <div class="flex h-[58px] items-center gap-3 xl:gap-3.5">
+        <NuxtLink to="/" class="flex shrink-0 items-baseline gap-2.5">
           <span
-            class="inline-flex size-11 items-center justify-center rounded-2xl border border-accent/25 bg-accent/10 font-mono text-xs uppercase tracking-[0.24em] text-accent"
+            class="inline-flex size-8 items-center justify-center rounded-[7px] border border-accent/25 bg-accent/10 font-mono text-[10px] uppercase tracking-[0.18em] text-accent"
           >
             {{ appConfig.site.mark }}
           </span>
           <div class="hidden min-[480px]:block">
-            <p class="single-line text-sm font-semibold text-ink-strong">
+            <p class="single-line text-[14px] font-semibold leading-5 text-ink-strong">
               {{ appConfig.site.name }}
             </p>
-            <p class="single-line font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint">
-              个人中文技术博客
+            <p class="single-line text-[11px] leading-4 text-ink-faint">
+              AI 技术、工具与长期笔记
             </p>
           </div>
         </NuxtLink>
 
-        <nav class="hidden min-w-0 flex-1 items-center justify-center gap-0.5 xl:flex">
+        <nav class="hidden min-w-0 flex-1 items-center justify-center gap-4 xl:flex">
           <NuxtLink
             v-for="item in publicNavigation"
             :key="item.to"
             :to="item.to"
-            class="single-line rounded-full px-3 py-2 text-[13px] transition"
+            class="single-line border-b border-transparent py-1 text-[13px] transition"
             :aria-current="isActiveLink(item.to) ? 'page' : undefined"
             :class="
               isActiveLink(item.to)
-                ? 'bg-accent/10 text-accent dark:bg-surface-strong/70 dark:text-ink-strong'
-                : 'text-ink-soft hover:bg-surface-muted/80 hover:text-ink-strong dark:hover:bg-surface/70'
+                ? 'border-accent/55 text-accent'
+                : 'text-ink-soft hover:border-line/30 hover:text-ink-strong'
             "
           >
             {{ item.label }}
@@ -62,7 +62,7 @@ watch(
           <AppThemeToggle />
           <NuxtLink
             to="/admin"
-            class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-ink-strong px-4 py-2 text-sm text-canvas transition hover:bg-accent hover:text-[#08110d]"
+            class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-[7px] bg-ink-strong px-3.5 py-2 text-sm text-canvas transition hover:bg-accent hover:text-[#08110d]"
           >
             <Sparkles class="size-4" />
             进入后台
@@ -72,7 +72,7 @@ watch(
 
         <button
           type="button"
-          class="ml-auto inline-flex size-11 items-center justify-center rounded-2xl border border-line/[0.15] bg-surface/70 text-ink-strong xl:hidden"
+          class="ml-auto inline-flex size-10 items-center justify-center rounded-[7px] border border-line/[0.15] bg-surface/70 text-ink-strong xl:hidden"
           :aria-expanded="isMenuOpen"
           aria-label="切换导航菜单"
           @click="isMenuOpen = !isMenuOpen"
@@ -89,14 +89,14 @@ watch(
         leave-from-class="translate-y-0 opacity-100"
         leave-to-class="translate-y-2 opacity-0"
       >
-        <div v-if="isMenuOpen" class="pb-5 xl:hidden">
-          <AppSurface class="space-y-5">
+        <div v-if="isMenuOpen" class="border-t border-line/[0.1] py-4 xl:hidden">
+          <div class="space-y-5">
             <div class="grid gap-2">
               <NuxtLink
                 v-for="item in publicNavigation"
                 :key="item.to"
                 :to="item.to"
-                class="flex items-center justify-between rounded-2xl px-4 py-3 text-sm text-ink-soft transition hover:bg-surface-muted/70 hover:text-ink-strong"
+                class="flex items-center justify-between rounded-[7px] px-3 py-2.5 text-sm text-ink-soft transition hover:bg-surface-muted/70 hover:text-ink-strong"
                 :aria-current="isActiveLink(item.to) ? 'page' : undefined"
                 :class="
                   isActiveLink(item.to)
@@ -115,12 +115,12 @@ watch(
               <AppThemeToggle />
               <NuxtLink
                 to="/admin"
-                class="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-ink-strong px-4 py-2.5 text-sm text-canvas transition hover:bg-accent hover:text-[#08110d]"
+                class="inline-flex items-center justify-center whitespace-nowrap rounded-[7px] bg-ink-strong px-4 py-2.5 text-sm text-canvas transition hover:bg-accent hover:text-[#08110d]"
               >
                 进入后台
               </NuxtLink>
             </div>
-          </AppSurface>
+          </div>
         </div>
       </transition>
     </div>

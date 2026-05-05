@@ -14,7 +14,7 @@ const isDark = computed({
 <template>
   <button
     type="button"
-    class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-line/[0.15] bg-surface/80 px-3.5 py-2 text-sm text-ink-soft transition hover:border-accent/30 hover:text-ink-strong"
+    class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-[7px] border border-line/[0.15] bg-surface/80 px-3 py-2 text-sm text-ink-soft transition hover:border-accent/30 hover:text-ink-strong"
     :aria-pressed="isDark"
     @click="isDark = !isDark"
   >
